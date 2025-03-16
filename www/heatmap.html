@@ -19,7 +19,7 @@
       object-fit: contain;
     }
     /* Put the heatmap on top of the image */
-    #heatmapContainer {
+    #heatmapContainer {/*画像の上にヒートマップを重ねる*/
       /* The heatmap will set its own size to the window's via JS */
       z-index: 10;
       position: fixed !important;
@@ -29,7 +29,7 @@
   </style>
 </head>
 <body>
-  <img id="content" src="media/example/starrynight.jpg" />
+  <img id="content" src="media/example/日本語文.png" />
   <div id="heatmapContainer"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.8.1/localforage.js"></script>
   <script src="webgazer.js"></script>
