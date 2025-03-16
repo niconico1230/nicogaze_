@@ -20,6 +20,7 @@ Instructions on use can be found in the README repository.
     </head>
     <body LANG="en-US" LINK="#0000ff" DIR="LTR">
       <canvas id="plotting_canvas" width="500" height="500" style="cursor:crosshair;"></canvas>
+      <!--**視線の予測ポイント（注視点）**を描画するキャンバス-->
 
         <script src="./node_modules/sweetalert/dist/sweetalert.min.js"></script>
 
@@ -28,8 +29,10 @@ Instructions on use can be found in the README repository.
         <script src="./js/precision_calculation.js"></script>
         <script src="./js/precision_store_points.js"></script>
 
+        <!--ナビゲーションバーの基本構文-->
         <nav id="webgazerNavbar" class="navbar navbar-expand-lg navbar-default navbar-fixed-top">
           <div class="container-fluid">
+            <!--小さい画面（スマホ等）でメニューを折りたたみ表示できるようにする「ハンバーガーボタン」。-->
             <div class="navbar-header">
               <!-- The hamburger menu button -->
               <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#myNavbar">
@@ -39,12 +42,12 @@ Instructions on use can be found in the README repository.
             <div class="collapse navbar-collapse" id="myNavbar">
               <ul class="nav navbar-nav">
                 <!-- Accuracy -->
-                <li id="Accuracy"><a>Not yet Calibrated</a></li>
-                <li><a onclick="Restart()" href="#">Recalibrate</a></li>
-                <li><a onclick="webgazer.applyKalmanFilter(!webgazer.params.applyKalmanFilter)" href="#">Toggle Kalman Filter</a></li>
+                <li id="Accuracy"><a>Not yet Calibrated</a></li> <!--現在のキャリブレーションの精度を表示-->
+                <li><a onclick="Restart()" href="#">Recalibrate</a></li><!--キャリブレーションを再スタートするボタン。-->
+                <li><a onclick="webgazer.applyKalmanFilter(!webgazer.params.applyKalmanFilter)" href="#">Toggle Kalman Filter</a></li><!--カルマンフィルターのON/OFF切り替え。視線の滑らかさに関係します（ONにするとノイズが減る）-->
               </ul>
-              <ul class="nav navbar-nav navbar-right">
-                <li><a class="helpBtn" onclick="helpModalShow()" href="#"><span class="glyphicon glyphicon-cog"></span> Help</a></li>
+              <ul class="nav navbar-nav navbar-right"><!--右側のヘルプボタン-->
+                <li><a class="helpBtn" onclick="helpModalShow()" href="#"><span class="glyphicon glyphicon-cog"></span> Help</a></li><!--モーダル（ポップアップ説明）が表示されます。                -->
               </ul>
             </div>
           </div>
@@ -70,10 +73,12 @@ Instructions on use can be found in the README repository.
             <div class="modal-content">
               <div class="modal-body">
                 <img src="media/example/calibration.png" width="100%" height="100%" alt="webgazer demo instructions"></img>
-              </div>
-              <div class="modal-footer">
+              </div><!--「使い方」画像を表示-->
+               <div class="modal-footer">
                 <button id="closeBtn" type="button" class="btn btn-default" data-bs-dismiss="modal">Close & load saved model </button>
+                <!--「キャリブレーションを始める」-->
                 <button type="button" id='start_calibration' class="btn btn-primary" data-bs-dismiss="modal" onclick="Restart()">Calibrate</button>
+                <!--「モデルを読み込んで再開する-->
               </div>
             </div>
 
