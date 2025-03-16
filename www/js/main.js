@@ -1,14 +1,28 @@
-window.onload = async function() {//ページが完全に読み込まれた後に実行される非同期関数。ここに WebGazer の起動や初期設定が含まれています。
+let loggingEnabled = true; // ログの状態を管理する変数（デフォルトはログが有効）
 
+// ログのオン・オフを切り替える関数
+function toggleLogging() {
+    loggingEnabled = !loggingEnabled;
+    // ログ状態に応じてボタンのテキストを変更
+    const button = document.getElementById('toggleLoggingBtn');
+    button.textContent = loggingEnabled ? 'ログを停止' : 'ログを開始';
+}
+
+
+window.onload = async function() {//ページが完全に読み込まれた後に実行される非同期関数。ここに WebGazer の起動や初期設定が含まれています。
+   
     //start the webgazer tracker
     await webgazer.setRegression('ridge') /* 回帰モデルの設定：'ridge' は視線を予測するためのアルゴリズム（回帰モデル）currently must set regression and tracker */
         //他にも 'weightedRidge' や 'threadedRidge' なども選べます
         //.setTracker('clmtrackr')
-        .setGazeListener(function(data, clock) {
-          //data には {x, y} 座標（視線の位置）が入ってる 下のコメントアウトを外せばログをとったり描画できる
-          //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
+        .setGazeListener(function(data, clock) {//視線追跡
+           // ログが有効な場合のみログを表示
+           if (loggingEnabled) {
+            //data には {x, y} 座標（視線の位置）が入ってる 下のコメントアウトを外せばログをとったり描画できる
+             console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
           //clock は WebGazer 開始からの経過時間（ミリ秒）
-          //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
+             console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
+           }
         })
         .saveDataAcrossSessions(true)//true にするとユーザーの視線データやキャリブレーションの進捗が ブラウザに保存されます
         //ページを再読み込みしてもデータが保持されます（localStorageやIndexedDB経由）
