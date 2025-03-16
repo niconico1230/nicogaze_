@@ -1,3 +1,5 @@
+
+
 let loggingEnabled = true; // ログの状態を管理する変数（デフォルトはログが有効）
 
 // ログのオン・オフを切り替える関数
@@ -8,14 +10,34 @@ function toggleLogging() {
     button.textContent = loggingEnabled ? 'ログを停止' : 'ログを開始';
 }
 
+let currentClock = 0; // clock時間を保持する変数
 
 window.onload = async function() {//ページが完全に読み込まれた後に実行される非同期関数。ここに WebGazer の起動や初期設定が含まれています。
-   
+ 
+     // 全ての<span>タグを取得
+     const spans = document.querySelectorAll('#textContainer span');
+
+     spans.forEach(span => {
+         // 各<span>タグの位置とサイズを取得
+         const rect = span.getBoundingClientRect();
+ 
+         // 中心位置を計算 (x, y)
+         const centerX = rect.left + rect.width / 2;
+         const centerY = rect.top + rect.height / 2;
+ 
+         // 結果をコンソールに表示
+         console.log(`中心位置 of ${span.textContent}: x = ${centerX}, y = ${centerY}`);
+     });
+
     //start the webgazer tracker
     await webgazer.setRegression('ridge') /* 回帰モデルの設定：'ridge' は視線を予測するためのアルゴリズム（回帰モデル）currently must set regression and tracker */
         //他にも 'weightedRidge' や 'threadedRidge' なども選べます
         //.setTracker('clmtrackr')
         .setGazeListener(function(data, clock) {//視線追跡
+
+            // clockの時間を保持
+            currentClock = clock;
+
            // ログが有効な場合のみログを表示
            if (loggingEnabled) {
             //data には {x, y} 座標（視線の位置）が入ってる 下のコメントアウトを外せばログをとったり描画できる
@@ -45,6 +67,14 @@ window.onload = async function() {//ページが完全に読み込まれた後�
     };
     setup();
 
+     // クリックイベントをリッスン
+     document.addEventListener('click', function(event) {
+        // クリック時に現在の時計時間を表示
+        console.log(`クリック地点: x = ${event.clientX}, y = ${event.clientY}`);
+        // 現在の `clock` を取得
+        console.log('クリックした時間: ', currentClock);
+    });
+
 };
 
 // Set to true if you want to save the data even if you reload the page.
@@ -66,3 +96,4 @@ function Restart(){
     ClearCalibration();  // キャリブレーションの点の状態をリセット
     PopUpInstruction();  //// 説明モーダルやポップアップを表示
 }
+
