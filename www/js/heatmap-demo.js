@@ -74,9 +74,15 @@ function setupHeatmap() {//ヒートマップの初期化
 // Heatmap buffer
 let lastTime;
 let lastGaze;
+let isLogging = true; //ログのオンオフを決める変数
 
 async function eyeListener(data, clock) {
   // data is the gaze data, clock is the time since webgazer.begin()
+  
+  if (data && isLogging)  {//データをコンソールに表示
+    console.log("視線位置:","x  " ,data.x,"y  ", data.y);
+    console.log("経過時間(ms):", clock);
+  }
 
   // Init if lastTime not set
   if(!lastTime) {
@@ -107,4 +113,9 @@ async function eyeListener(data, clock) {
 
   lastGaze = data;
   lastTime = clock;
+}
+function toggleLogging() {
+  isLogging = !isLogging;
+  const btn = document.getElementById('toggleLoggingBtn');
+  btn.textContent = isLogging ? "ログ停止" : "ログ開始";
 }
