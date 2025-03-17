@@ -6,12 +6,12 @@ button {
     border-radius: 4px;
 }
 /* Video Feed Styling */
-#overlay {
+/*#overlay {*/
 /* Video Feed Styling:
  * Include the !important keyword to override default styles applied by JS.
  * webgazer.js sets defaults for: display, position, top, left, width, height
  */
-}
+/*}*/
 #webgazerVideoContainer {
     display: block !important; 
     position: fixed !important;
@@ -124,4 +124,18 @@ li {
     top: 20px;  /* 上から20px */
     right: 60px;  /* 右から60px */
     z-index: 1000;  /* 他の要素と重ならないように上に表示 */
+}
+
+.char  {
+    font-size: 24px;
+    color: #333;
+    /*margin: 0 5px;*/
+}
+#textContainer {
+    position: absolute;
+    top: 30%;   /* 縦の中央 */
+    left: 50%;  /* 横の中央 */
+    transform: translate(-50%, -50%); /* 要素を正確に中央に配置 */
+    text-align: center;  /* 内部の文字を中央揃え */
+    display: flex;  /* フレックスボックスを使用して横並びに */
 }
