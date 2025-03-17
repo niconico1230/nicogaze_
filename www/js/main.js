@@ -39,11 +39,13 @@ window.onload = async function() {//ページが完全に読み込まれた後�
             currentClock = clock;
 
            // ログが有効な場合のみログを表示
-           if (loggingEnabled) {
+           if (data &&loggingEnabled) {
+            console.log("視線位置:","x  " ,data.x,"y  ", data.y);
+            console.log("経過時間(ms):", clock);
             //data には {x, y} 座標（視線の位置）が入ってる 下のコメントアウトを外せばログをとったり描画できる
-             console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
+           //  console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
           //clock は WebGazer 開始からの経過時間（ミリ秒）
-             console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
+            //console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
            }
         })
         .saveDataAcrossSessions(true)//true にするとユーザーの視線データやキャリブレーションの進捗が ブラウザに保存されます
@@ -65,6 +67,9 @@ window.onload = async function() {//ページが完全に読み込まれた後�
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         canvas.style.position = 'fixed';
+
+        // ここで willReadFrequently を設定したキャンバスとコンテキストを作成 追加
+        //const context = canvas.getContext('2d', { willReadFrequently: true });
     };
     setup();
 

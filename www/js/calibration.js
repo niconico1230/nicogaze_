@@ -74,11 +74,13 @@ function calcAccuracy() {//精度計算のための関数
                         confirm: true,
                     }
                 }).then(isConfirm => {
+                  document.getElementById('textContainer').style.display = 'block';//文字表示の処理
                         if (isConfirm){
                             //clear the calibration & hide the last middle button
                             ClearCanvas();
                             webgazer.removeMouseEventListeners();//学習をなくす　追加した
                             //webgazer.setTraining(false);//学習をなくす　追加した
+                            
                         } else {
                             //use restart function to restart the calibration
                             document.getElementById("Accuracy").innerHTML = "<a>Not yet Calibrated</a>";
