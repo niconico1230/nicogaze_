@@ -61,6 +61,7 @@ function calcAccuracy() {//精度計算のための関数
     
         sleep(5000).then(() => {
                 stop_storing_points_variable(); // 視線データを一定時間保存する関数stop storing the prediction points
+
                 var past50 = webgazer.getStoredPoints(); // retrieve the stored points
                 var precision_measurement = calculatePrecision(past50);//保存された50個のデータから精度を計算する関数です。
                 var accuracyLabel = "<a>Accuracy | "+precision_measurement+"%</a>";
@@ -76,6 +77,8 @@ function calcAccuracy() {//精度計算のための関数
                         if (isConfirm){
                             //clear the calibration & hide the last middle button
                             ClearCanvas();
+                            webgazer.removeMouseEventListeners();//学習をなくす　追加した
+                            //webgazer.setTraining(false);//学習をなくす　追加した
                         } else {
                             //use restart function to restart the calibration
                             document.getElementById("Accuracy").innerHTML = "<a>Not yet Calibrated</a>";

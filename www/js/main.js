@@ -48,6 +48,7 @@ window.onload = async function() {//ページが完全に読み込まれた後�
         })
         .saveDataAcrossSessions(true)//true にするとユーザーの視線データやキャリブレーションの進捗が ブラウザに保存されます
         //ページを再読み込みしてもデータが保持されます（localStorageやIndexedDB経由）
+        //クリックしたときのみデータが来ていた
         .begin()
         //WebGazerを起動します。実行しないと何も始まりません。
 

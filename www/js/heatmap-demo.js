@@ -1,4 +1,4 @@
-// ページをリロードしてもデータを保存しない
+// ページをリロードしてもデータを保存するか
 window.saveDataAcrossSessions = true;
 
 // heatmap configuration 半径,最大/最小の透明度,ぼかし具合
@@ -98,7 +98,7 @@ async function eyeListener(data, clock) {
       let point = {
         x: Math.floor(lastGaze.x),//移動するたびに記録、一定の時間ではない
         y: Math.floor(lastGaze.y),
-        value: duration
+        value: duration//前回取得からの経過時間
       }
       heatmapInstance.addData(point); //視線の情報（x, y座標と視線時間）をヒートマップに反映。
 
