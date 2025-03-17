@@ -17,17 +17,7 @@ window.onload = async function() {//ページが完全に読み込まれた後�
      // 全ての<span>タグを取得
      const spans = document.querySelectorAll('#textContainer span');
 
-     spans.forEach(span => {
-         // 各<span>タグの位置とサイズを取得
-         const rect = span.getBoundingClientRect();
- 
-         // 中心位置を計算 (x, y)
-         const centerX = rect.left + rect.width / 2;
-         const centerY = rect.top + rect.height / 2;
- 
-         // 結果をコンソールに表示
-         console.log(`中心位置 of ${span.textContent}: x = ${centerX}, y = ${centerY}`);
-     });
+     
 
     //start the webgazer tracker
     await webgazer.setRegression('ridge') /* 回帰モデルの設定：'ridge' は視線を予測するためのアルゴリズム（回帰モデル）currently must set regression and tracker */
@@ -69,7 +59,7 @@ window.onload = async function() {//ページが完全に読み込まれた後�
         canvas.style.position = 'fixed';
 
         // ここで willReadFrequently を設定したキャンバスとコンテキストを作成 追加
-        //const context = canvas.getContext('2d', { willReadFrequently: true });
+        const context = canvas.getContext('2d', { willReadFrequently: true });
     };
     setup();
 

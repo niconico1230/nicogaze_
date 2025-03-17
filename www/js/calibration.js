@@ -75,6 +75,14 @@ function calcAccuracy() {//精度計算のための関数
                     }
                 }).then(isConfirm => {
                   document.getElementById('textContainer').style.display = 'block';//文字表示の処理
+                  const spans = document.querySelectorAll('span');
+                  spans.forEach(span => { 
+                      const rect = span.getBoundingClientRect();
+                      const centerX = rect.left + rect.width / 2;
+                      const centerY = rect.top + rect.height / 2;
+                      console.log(`中心位置 of ${span.textContent}: x = ${centerX}, y = ${centerY}`);
+                  });
+
                         if (isConfirm){
                             //clear the calibration & hide the last middle button
                             ClearCanvas();
