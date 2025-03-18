@@ -88,6 +88,7 @@ function calcAccuracy() {//精度計算のための関数
                             ClearCanvas();
                             webgazer.removeMouseEventListeners();//学習をなくす　追加した
                             //webgazer.setTraining(false);//学習をなくす　追加した
+                            //startDrawingGazePoints();// 視線描画を開始
                             
                         } else {
                             //use restart function to restart the calibration
@@ -193,3 +194,5 @@ function ClearCalibration(){//キャリブレーションをリセットする�
 function sleep (time) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
+
+

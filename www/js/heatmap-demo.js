@@ -22,7 +22,7 @@ window.addEventListener('load', async function() {
   }
   const webgazerInstance = await webgazer.setRegression('ridge') /* 回帰モデルcurrently must set regression and tracker */
     .setTracker('TFFacemesh')
-    .saveDataAcrossSessions(true)//true にするとユーザーの視線データやキャリブレーションの進捗が ブラウザに保存されます
+    //.saveDataAcrossSessions(true)//true にするとユーザーの視線データやキャリブレーションの進捗が ブラウザに保存されます
     .begin();
   
   // Turn off video

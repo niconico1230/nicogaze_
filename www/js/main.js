@@ -15,11 +15,9 @@ let currentClock = 0; // clock時間を保持する変数
 window.onload = async function() {//ページが完全に読み込まれた後に実行される非同期関数。ここに WebGazer の起動や初期設定が含まれています。
  
      // 全ての<span>タグを取得
-     const spans = document.querySelectorAll('#textContainer span');
+     //const spans = document.querySelectorAll('#textContainer span');
 
-     
-
-    //start the webgazer tracker
+    ///start the webgazer tracker
     await webgazer.setRegression('ridge') /* 回帰モデルの設定：'ridge' は視線を予測するためのアルゴリズム（回帰モデル）currently must set regression and tracker */
         //他にも 'weightedRidge' や 'threadedRidge' なども選べます
         //.setTracker('clmtrackr')
@@ -30,8 +28,8 @@ window.onload = async function() {//ページが完全に読み込まれた後�
 
            // ログが有効な場合のみログを表示
            if (data &&loggingEnabled) {
-            console.log("視線位置:","x  " ,data.x,"y  ", data.y);
-            console.log("経過時間(ms):", clock);
+            console.log("経過時間(ms):", clock,"  視線位置:","x " ,data.x,"y ", data.y,);
+            //console.log("経過時間(ms):", clock);
             //data には {x, y} 座標（視線の位置）が入ってる 下のコメントアウトを外せばログをとったり描画できる
            //  console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
           //clock は WebGazer 開始からの経過時間（ミリ秒）
@@ -45,8 +43,8 @@ window.onload = async function() {//ページが完全に読み込まれた後�
         //WebGazerを起動します。実行しないと何も始まりません。
 
         webgazer.showVideoPreview(true) /*ブラウザ上に Webカメラの映像を表示するかどうか    shows all video previews */
-            .showPredictionPoints(true) /* ??視線予測の位置に 小さな四角形を100msごとに表示 shows a square every 100 milliseconds where current prediction is */
-            .applyKalmanFilter(true); /*カルマンフィルターを有効化,視線予測のブレ（ノイズ）を軽減して、スムーズな動きを実現 Kalman Filter defaults to on. Can be toggled by user. */
+                .showPredictionPoints(true) /* ??視線予測の位置に 小さな四角形を100msごとに表示 shows a square every 100 milliseconds where current prediction is */
+                .applyKalmanFilter(true); /*カルマンフィルターを有効化,視線予測のブレ（ノイズ）を軽減して、スムーズな動きを実現 Kalman Filter defaults to on. Can be toggled by user. */
 
     //Set up the webgazer video feedback.
     var setup = function() {
@@ -66,9 +64,10 @@ window.onload = async function() {//ページが完全に読み込まれた後�
      // クリックイベントをリッスン
      document.addEventListener('click', function(event) {
         // クリック時に現在の時計時間を表示
-        console.log(`クリック地点: x = ${event.clientX}, y = ${event.clientY}`);
+        console.log(`%cクリック地点: x = ${event.clientX}, y = ${event.clientY}%c`, 'color: red; font-weight: bold; font-size: 13px;');
         // 現在の `clock` を取得
-        console.log('クリックした時間: ', currentClock);
+        //console.log('クリックした時間: ', currentClock);
+        console.log('%cクリックした時間: %s', 'color: red; font-weight: bold; font-size: 13px;', currentClock);
     });
 
 };
