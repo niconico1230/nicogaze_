@@ -122,7 +122,14 @@ li {
 #toggleLoggingBtn {
     position: absolute;  /* 絶対位置指定 */
     top: 20px;  /* 上から20px */
-    right: 60px;  /* 右から60px */
+    right: 30px;  /* 右から60px */
+    z-index: 1000;  /* 他の要素と重ならないように上に表示 */
+}
+
+#clearCanvasBtn{
+    position: absolute;  /* 絶対位置指定 */
+    top: 70px;  /* 上から20px */
+    right: 30px;  /* 右から60px */
     z-index: 1000;  /* 他の要素と重ならないように上に表示 */
 }
 
