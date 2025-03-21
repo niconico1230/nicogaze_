@@ -22,12 +22,13 @@ window.onload = async function() {//ページが完全に読み込まれた後�
         //他にも 'weightedRidge' や 'threadedRidge' なども選べます
         //.setTracker('clmtrackr')
         .setGazeListener(function(data, clock) {//視線追跡
-
+            
             // clockの時間を保持
             currentClock = clock;
 
            // ログが有効な場合のみログを表示
            if (data &&loggingEnabled) {
+           // drawCoordinates('blue', data.x, data.y)
             console.log("経過時間(ms):", clock,"  視線位置:","x " ,data.x,"y ", data.y,);
             //console.log("経過時間(ms):", clock);
             //data には {x, y} 座標（視線の位置）が入ってる 下のコメントアウトを外せばログをとったり描画できる
@@ -35,6 +36,9 @@ window.onload = async function() {//ページが完全に読み込まれた後�
           //clock は WebGazer 開始からの経過時間（ミリ秒）
             //console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
            }
+           if (data && data.x && data.y) {
+            displayGazePoint(data.x, data.y);
+        }
         })
         .saveDataAcrossSessions(true)//true にするとユーザーの視線データやキャリブレーションの進捗が ブラウザに保存されます
         //ページを再読み込みしてもデータが保持されます（localStorageやIndexedDB経由）
@@ -43,21 +47,25 @@ window.onload = async function() {//ページが完全に読み込まれた後�
         //WebGazerを起動します。実行しないと何も始まりません。
 
         webgazer.showVideoPreview(true) /*ブラウザ上に Webカメラの映像を表示するかどうか    shows all video previews */
-                .showPredictionPoints(true) /* ??視線予測の位置に 小さな四角形を100msごとに表示 shows a square every 100 milliseconds where current prediction is */
+                //.showPredictionPoints(true) /* ??視線予測の位置に 小さな四角形を100msごとに表示 shows a square every 100 milliseconds where current prediction is */
                 .applyKalmanFilter(true); /*カルマンフィルターを有効化,視線予測のブレ（ノイズ）を軽減して、スムーズな動きを実現 Kalman Filter defaults to on. Can be toggled by user. */
+
+        webgazer.addMouseEventListeners();
 
     //Set up the webgazer video feedback.
     var setup = function() {
 
         //Set up the main canvas. The main canvas is used to calibrate the webgazer.
         //画面全体サイズのキャンバスを作成.キャリブレーションの点を表示するために使います
-        var canvas = document.getElementById("plotting_canvas");
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        canvas.style.position = 'fixed';
+        var canvas = document.getElementById("plotting_canvas");//HTML内の <canvas id="plotting_canvas"> を取得して、canvas という変数に入れてる。
+        canvas.width = window.innerWidth; //canvas.width と canvas.height は描画解像度（ピクセル単位）
+        canvas.height = window.innerHeight;//window.innerWidth と window.innerHeight は、現在のブラウザウィンドウの幅と高さ。
+        canvas.style.position = 'fixed'; //スクロールしても画面に固定されたまま
 
         // ここで willReadFrequently を設定したキャンバスとコンテキストを作成 追加
         const context = canvas.getContext('2d', { willReadFrequently: true });
+        //2D描画用の「コンテキスト（描画環境）」を取得。
+        //willReadFrequentlyがあると、getImageData() などのピクセル取得処理がパフォーマンス最適化されることがある。
     };
     setup();
 
@@ -70,11 +78,37 @@ window.onload = async function() {//ページが完全に読み込まれた後�
         console.log('%cクリックした時間: %s', 'color: red; font-weight: bold; font-size: 13px;', currentClock);
     });
 
+     // キャンバスクリアボタンの設定
+     const clearButton = document.getElementById("clearCanvasBtn");
+     clearButton.addEventListener("click", clearScreen);
+
 };
+
+function displayGazePoint(x, y) {//視線を描画
+    const canvas = document.getElementById("plotting_canvas");
+    const context = canvas.getContext('2d');
+    
+    // 以前の視線位置を消去
+    //context.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // 視線位置に円を描画
+    context.beginPath();
+    context.arc(x, y, 3, 0, 2 * Math.PI); // 10pxの円を描画
+    context.fillStyle = 'blue'; // 円の色を赤に設定
+    context.fill();
+};
+
+// キャンバスをクリアする関数
+function clearScreen() {
+    const canvas = document.getElementById("plotting_canvas");
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height); // キャンバス全体をクリア
+    console.log('キャンバスがクリアされました');
+}
 
 // Set to true if you want to save the data even if you reload the page.
 // グローバル設定で、true の場合キャリブレーションや視線データが再読み込み後も保持されます
-window.saveDataAcrossSessions = true;//？？どこにクリア処理があるかわからない
+window.saveDataAcrossSessions = true;
 
 //ページを閉じる/リロードする時に WebGazer を終了する処理
 //データは保持されつつ、セッションを終了させます（特にビデオストリームのクリーンアップ）
@@ -91,4 +125,5 @@ function Restart(){
     ClearCalibration();  // キャリブレーションの点の状態をリセット
     PopUpInstruction();  //// 説明モーダルやポップアップを表示
 }
+
 
