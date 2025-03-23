@@ -120,3 +120,10 @@ function toggleLogging() {
   const btn = document.getElementById('toggleLoggingBtn');
   btn.textContent = isLogging ? "ログ停止" : "ログ開始";
 }
+
+function resetHeatmap() {
+  if (heatmapInstance) {
+    heatmapInstance.setData({ max: 1, data: [] }); // ヒートマップの中身を空にする
+    console.log("ヒートマップをリセットしました。");
+  }
+}
