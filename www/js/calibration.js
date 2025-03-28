@@ -4,6 +4,7 @@ var CalibrationPoints={};//それぞれのキャリブレーションポイン�
 // Find the help modal
 var helpModal;//ヘルプモーダルを表示するための変数ですが、実際にモーダルを操作する際に初期化されます
 
+
 /**
  * Clear the canvas and the calibration button.
  * キャリブレーション用のボタンを非表示にし、キャンバス（plotting_canvas）をクリアする関数です。これによって、以前のキャリブレーション結果やデータが消去されます。
@@ -74,14 +75,23 @@ function calcAccuracy() {//精度計算のための関数
                         confirm: true,
                     }
                 }).then(isConfirm => {
-                  document.getElementById('textContainer').style.display = 'block';//文字表示の処理
-                  const spans = document.querySelectorAll('span');
-                  spans.forEach(span => { 
-                      const rect = span.getBoundingClientRect();
-                      const centerX = rect.left + rect.width / 2;
-                      const centerY = rect.top + rect.height / 2;
-                      console.log(`中心位置 of ${span.textContent}: x = ${centerX}, y = ${centerY}`);
-                  });
+                  const container = document.getElementById("textContainer");
+                  container.style.display = "block";  // テキストを表示
+
+                      const text = container.textContent;
+                    
+                      for (let i = 0; i < text.length; i++) {
+                        const range = document.createRange();
+                        range.setStart(container.firstChild, i);
+                        range.setEnd(container.firstChild, i + 1);
+                        const rect = range.getBoundingClientRect();
+                        // 中心座標を計算
+                        const centerX = rect.left + rect.width / 2;
+                        const centerY = rect.top + rect.height / 2;
+                    
+                        console.log(`文字: ${text[i]} X: ${centerX} Y: ${centerY}`);
+                      }
+                    //});
 
                         if (isConfirm){
                             //clear the calibration & hide the last middle button
@@ -122,11 +132,11 @@ function calPointClick(node) {//5回クリックされたらそのポイント�
     }
 
     //Show the middle calibration point after all other points have been clicked.
-    if (PointCalibrate == 8){
+    if (PointCalibrate == 12){
         document.getElementById('Pt5').style.removeProperty('display');
     }
 
-    if (PointCalibrate >= 9){ // last point is calibrated
+    if (PointCalibrate >= 13){ // last point is calibrated
         // grab every element in Calibration class and hide them except the middle point.
         document.querySelectorAll('.Calibration').forEach((i) => {
             i.style.setProperty('display', 'none');

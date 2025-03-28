@@ -13,6 +13,19 @@ const config = {
 let heatmapInstance;
 
 window.addEventListener('load', async function() {
+  //手動でローカルストレージから復元（これは必須ではないけど明示的にやっておく）
+  const savedData = localStorage.getItem('webgazerGlobalData');
+  //const savedSettings = localStorage.getItem('webgazerGlobalSettings');
+
+  if (savedData ) {
+    localStorage.setItem('webgazerGlobalData', savedData);
+    //localStorage.setItem('webgazerGlobalSettings', savedSettings);
+    console.log("📦 キャリブレーションデータを復元しました");
+  } else {
+    console.warn("⚠️ 保存されたキャリブレーションデータが見つかりませんでした");
+  }
+
+
   // Init webgazer
   if (!window.saveDataAcrossSessions) {
       var localstorageDataLabel = 'webgazerGlobalData';
@@ -22,7 +35,7 @@ window.addEventListener('load', async function() {
   }
   const webgazerInstance = await webgazer.setRegression('ridge') /* 回帰モデルcurrently must set regression and tracker */
     .setTracker('TFFacemesh')
-    //.saveDataAcrossSessions(true)//true にするとユーザーの視線データやキャリブレーションの進捗が ブラウザに保存されます
+    .saveDataAcrossSessions(true)//true にするとユーザーの視線データやキャリブレーションの進捗が ブラウザに保存されます
     .begin();
   
   // Turn off video
