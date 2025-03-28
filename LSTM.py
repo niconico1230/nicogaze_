@@ -1,70 +1,116 @@
 import torch
 import torch.nn as nn
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+from torch.utils.data import DataLoader, TensorDataset
+from DATAeye import eyelist
+from DATAmoji import mojilist
 
-# 気温のデータ
-data = [10, 12, 14, 16, 18, 20, 22, 24, 26, 28]
 
-# データをテンソルに変換 計算処理の効率や利便性が向上
-data = torch.tensor(data)
+# 文字位置データをマッピング
+char_dict = {char: (x, y) for char, x, y in mojilist}
 
-class LSTMModel(nn.Module):
-    def __init__(self):
-        super().__init__()
+# 視線データの前処理
+gaze_data = np.array(eyelist)
+times = gaze_data[:, 0]
+gaze_x = gaze_data[:, 1]
+gaze_y = gaze_data[:, 2]
 
-        # LSTMセル
-        self.lstm = nn.LSTM(input_size=1, hidden_size=10, num_layers=1)
-        #nn.LSTM: LSTMセルを使って時系列の特徴を捉える
-        #input_size=1: 各時点の入力は1次元（今回は1つの気温）
-        #hidden_size=10: 隠れ状態の次元数。LSTMが内部で保持する情報のサイズ。
-        #num_layers=1: LSTM層は1層だけ
+# 正規化（視線座標を0~1にスケーリング）
+scaler_x = MinMaxScaler()
+scaler_y = MinMaxScaler()
+gaze_x_scaled = scaler_x.fit_transform(gaze_x.reshape(-1, 1))
+gaze_y_scaled = scaler_y.fit_transform(gaze_y.reshape(-1, 1))
 
-        # 全結合層
-        self.fc = nn.Linear(in_features=10, out_features=1)
-        #nn.Linear: 最後にLSTM出力（10次元）を1次元の気温に変換するための全結合層
+# LSTMの入力に合わせるため、視線データを時間ステップごとに切り出す
+sequence_length = 3  # 例えば3つのタイムステップで予測する
+X, y = [], []
+for i in range(len(gaze_data) - sequence_length):
+    X.append(np.column_stack((gaze_x_scaled[i:i+sequence_length], gaze_y_scaled[i:i+sequence_length])))
+    # 各文字に対して視線滞在時間を予測するため、文字の位置に対する滞在時間を計算
+    #y.append([1 if (char_x-20 <= gaze_x[i] <= char_x+20) and (char_y-50 <= gaze_y[i] <= char_y+50) else 0 for _, char_x, char_y in mojilist])
+    # ユークリッド距離を計算して最も近い文字を見たとする
+    gaze_point = np.array([gaze_x[i], gaze_y[i]])  # 現在の視線位置
+    min_distance = float('inf')
+    closest_char_idx = -1
 
-    def forward(self, x):#入力をLSTMに通し、その出力を全結合層に通して結果を返します
-        # LSTMセルにデータを入力
-        lstm_out, _ = self.lstm(x)
+    for idx, (_, char_x, char_y) in enumerate(mojilist):
+        char_point = np.array([char_x, char_y])
+        distance = np.linalg.norm(gaze_point - char_point)  # ユークリッド距離
 
-        # 全結合層で出力を計算
-        out = self.fc(lstm_out)
+        if distance < min_distance:
+            min_distance = distance
+            closest_char_idx = idx  # 最も近い文字のインデックスを更新
 
-        return out
+    # ラベルを作成（すべて0、最も近い文字だけ1）
+    label = [0] * len(mojilist)
+    label[closest_char_idx] = 1
+    y.append(label)
+
     
+X = np.array(X)
+print(X)
+y = np.array(y)
+print("y",y)
+
+# PyTorchのテンソルに変換
+X_tensor = torch.tensor(X, dtype=torch.float32)
+y_tensor = torch.tensor(y, dtype=torch.float32)
+
+# データローダーを作成
+dataset = TensorDataset(X_tensor, y_tensor)
+dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+
+# LSTMモデルの定義
+class LSTMModel(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(LSTMModel, self).__init__()
+        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True)
+        self.fc = nn.Linear(hidden_size, output_size)
+
+    def forward(self, x):
+        lstm_out, (hn, cn) = self.lstm(x)
+        out = self.fc(hn[-1])  # 最後の隠れ状態を使って予測
+        return out
+
 # モデルのインスタンス化
-model = LSTMModel()
+input_size = 2  # x, yの2次元座標
+hidden_size = 50  # LSTMの隠れ状態のユニット数
+output_size = len(mojilist)  # 文字数分の出力
 
-# 損失関数の定義
-loss_fn = nn.MSELoss()
-#MSELoss：予測値と正解値の平均二乗誤差（回帰問題に使われる）
+model = LSTMModel(input_size, hidden_size, output_size)
 
-# オプティマイザの定義 Adamという最適化アルゴリズムが設定
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-#Adamオプティマイザ：勾配降下法の1つで、学習を効率的に進めるアルゴリズム
+# 損失関数と最適化手法
+criterion = nn.BCEWithLogitsLoss()  # 複数のクラスに対する二項交差エントロピー損失
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-# エポック数の設定
-epochs = 100 #訓練データを何回用いたかを表す数
-
-# 学習ループ
+# モデルの学習
+epochs = 10
 for epoch in range(epochs):
-    # モデルの予測
-    outputs = model(data[:-1])
+    model.train()
+    running_loss = 0.0
+    for inputs, labels in dataloader:
+        optimizer.zero_grad()
 
-    # 損失の計算
-    loss = loss_fn(outputs, data[1:])
+        # フォワードパス
+        outputs = model(inputs)
 
-    # パラメータの更新
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
+        # 損失の計算
+        loss = criterion(outputs, labels)
+        
+        # バックプロパゲーションと最適化
+        loss.backward()
+        optimizer.step()
+        
+        running_loss += loss.item()
 
-    # 損失の出力
-    print(f"epoch: {epoch+1}, loss: {loss.item()}")
+    print(f"Epoch [{epoch+1}/{epochs}], Loss: {running_loss/len(dataloader):.4f}")
 
-# モデルの予測
-outputs = model(data[:-1])
-#学習後、data[:-1]（最初から最後の1個手前まで）を使って次の気温 data[1:] を予測します。
-
-# 予測と実際の値の比較
-print(f"予測: {outputs}")
-print(f"実際の値: {data[1:]}")
+# 予測
+model.eval()
+with torch.no_grad():
+    for inputs, labels in dataloader:
+        
+        outputs = model(inputs)
+        _, predicted = torch.max(outputs, 1)
+        print(f"Predicted: {predicted.numpy()}")
