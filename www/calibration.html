@@ -45,8 +45,9 @@ Instructions on use can be found in the README repository.
                 <li id="Accuracy"><a>Not yet Calibrated</a></li> <!--現在のキャリブレーションの精度を表示-->
                 <li><a onclick="Restart()" href="#">Recalibrate</a></li><!--キャリブレーションを再スタートするボタン。-->
                 <li><a onclick="webgazer.applyKalmanFilter(!webgazer.params.applyKalmanFilter)" href="#">Toggle Kalman Filter</a></li><!--カルマンフィルターのON/OFF切り替え。視線の滑らかさに関係します（ONにするとノイズが減る）-->
-                <button id="toggleLoggingBtn" class="btn btn-warning" onclick="toggleLogging()" >ログを停止</button>
+                <!--<button id="toggleLoggingBtn" class="btn btn-warning" onclick="toggleLogging()" >ログを停止</button>-->
                 <button id="clearCanvasBtn">キャンバスをクリア</button>
+                <button id="toggleRecordingBtn">記録開始</button>
               </ul>
               <ul class="nav navbar-nav navbar-right"><!--右側のヘルプボタン-->
                 <li><a class="helpBtn" onclick="helpModalShow()" href="#"><i class="glyphicon glyphicon-cog"></i> Help</a></li><!--モーダル（ポップアップ説明）が表示されます。                -->
@@ -65,63 +66,14 @@ Instructions on use can be found in the README repository.
             <input type="button" class="Calibration" id="Pt7"></input>
             <input type="button" class="Calibration" id="Pt8"></input>
             <input type="button" class="Calibration" id="Pt9"></input>
+            <input type="button" class="Calibration" id="Pt10"></input><!--追加-->
+            <input type="button" class="Calibration" id="Pt11"></input>
+            <input type="button" class="Calibration" id="Pt12"></input>
+            <input type="button" class="Calibration" id="Pt13"></input>
         </div>
         <!--<div id="textContainer" style="margin-top: 50px; display: none;">-->
-        <div id="textContainer" style="margin-top: 50px; display: none; ">
-          <span id="char1" class="char">視</span>
-          <span id="char2" class="char">線</span>
-          <span id="char3" class="char">の</span>
-          <span id="char4" class="char">検</span>
-          <span id="char5" class="char">出</span>
-          <span id="char6" class="char">に</span>
-          <span id="char7" class="char">関</span>
-          <span id="char8" class="char">す</span>
-          <span id="char9" class="char">る</span>
-          <span id="char10" class="char">テ</span>
-          <span id="char11" class="char">ス</span>
-          <span id="char12" class="char">ト</span>
-          <span id="char13" class="char">で</span>
-          <span id="char14" class="char">す</span>
-          <span id="char15" class="char">。</span>
-          <br>
-          <span id="char16" class="char">翠</span>
-          <span id="char17" class="char">黛</span>
-          <span id="char18" class="char">の</span>
-          <span id="char19" class="char">山</span>
-          <span id="char20" class="char">々</span>
-          <span id="char21" class="char">が</span>
-          <span id="char22" class="char">連</span>
-          <span id="char23" class="char">な</span>
-          <span id="char24" class="char">り</span>
-          <span id="char25" class="char">、</span>
-          <span id="char26" class="char">湖</span>
-          <span id="char27" class="char">面</span>
-          <span id="char28" class="char">に</span>
-          <span id="char29" class="char">は</span>
-          <span id="char30" class="char">翡</span>
-          <span id="char31" class="char">翠</span>
-          <span id="char32" class="char">の</span>
-          <span id="char33" class="char">よ</span>
-          <span id="char34" class="char">う</span>
-          <span id="char35" class="char">な</span>
-          <br>
-          <span id="char36" class="char">光</span>
-          <span id="char37" class="char">が</span>
-          <span id="char38" class="char">差</span>
-          <span id="char39" class="char">し</span>
-          <span id="char40" class="char">込</span>
-          <span id="char41" class="char">み</span>
-          <span id="char42" class="char">、</span>
-          <span id="char43" class="char">寂</span>
-          <span id="char44" class="char">寥</span>
-          <span id="char45" class="char">の</span>
-          <span id="char46" class="char">趣</span>
-          <span id="char47" class="char">が</span>
-          <span id="char48" class="char">漂</span>
-          <span id="char49" class="char">う</span>
-          <span id="char50" class="char">。</span>
-          
-        </div>
+        <div id="textContainer" style="margin-top: 50px; display: none; " >夜の闇に燦めく星々が、静かな空に燿く光を放っていた。私はその光を見上げながら、心の中で自分に問いかけた。「この道を選ぶべきか、あるいは別の道を行くべきか」と。愉しむべき時に愉しみ、畏れるべき事柄には慎みを持ち、拗れることなく前進するべきだと、何度も自分に言い聞かせた。だが、いくつもの選択肢に燦然と輝く光が私を誘う。人々はその中で選択を誤り、誤った道を選ぶことで、何度も自らの心を毀してきたのだ。
+          その時、誰かが私の背後で嗤ったような気がした。振り向くと、誰もいなかった。ただ風が吹き、柳の枝が揺れているだけだ。私はその音に耳を傾けながら、聴すべき声を聴き、唆す者の声には決して従わぬことを誓った。</div>
 
 
         <!-- Modal -->
@@ -147,6 +99,18 @@ Instructions on use can be found in the README repository.
         <!-- Latest compiled JavaScript -->
         <script src="./js/resize_canvas.js"></script>
         <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
+        <!--<script>
+          const container = document.getElementById("text");
+          const text = container.textContent;
+      
+          for (let i = 0; i < text.length; i++) {
+            const range = document.createRange();
+            range.setStart(container.firstChild, i);
+            range.setEnd(container.firstChild, i + 1);
+            const rect = range.getBoundingClientRect();
+      
+            console.log(`文字: ${text[i]} X: ${rect.left} Y: ${rect.top}`);
+          }
+        </script> -->
     </body>
 </html>

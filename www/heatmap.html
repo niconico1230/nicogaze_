@@ -9,6 +9,8 @@
         style="position: fixed; top: 60px; right: 20px; z-index: 9999; padding: 10px;"
         onclick="resetHeatmap()">ヒートマップをリセット</button>
   <style>
+ 
+
     /* Make sure everything in body can go to the edge of the page */
     /* Particularly, Chrome's default styles have an 8px margin for the body */
     html, body {
@@ -18,11 +20,17 @@
     /* Make body take up entire page */
     body, #content {
       width: 100vw;
+      
       height: 100vh;
     }
     /* Make the image autoscale to the page */
     #content {
-      object-fit: contain;
+      /*object-fit: contain;*/
+      position: absolute; /* 位置を絶対指定 */
+      right: 8%; /* 右から20%の位置に配置 */
+     top: 5%; /* 必要に応じて縦位置を調整 */
+      height: auto; /* 高さはアスペクト比を保って自動調整 */
+      max-width: 80%; /* 画像の最大幅を80%に設定 */
     }
     /* Put the heatmap on top of the image */
     #heatmapContainer {/*画像の上にヒートマップを重ねる*/
@@ -35,7 +43,23 @@
   </style>
 </head>
 <body>
-  <img id="content" src="media/example/日本語文.png" />
+  <div id="textContainer" style="margin-top: 50px;" >夜の闇に燦めく星々が、静かな空に燿く光を放っていた。私はその光を見上げながら、心の中で自分に問いかけた。「この道を選ぶべきか、あるいは別の道を行くべきか」と。愉しむべき時に愉しみ、畏れるべき事柄には慎みを持ち、拗れることなく前進するべきだと、何度も自分に言い聞かせた。だが、いくつもの選択肢に燦然と輝く光が私を誘う。人々はその中で選択を誤り、誤った道を選ぶことで、何度も自らの心を毀してきたのだ。
+    その時、誰かが私の背後で嗤ったような気がした。振り向くと、誰もいなかった。ただ風が吹き、柳の枝が揺れているだけだ。私はその音に耳を傾けながら、聴すべき声を聴き、唆す者の声には決して従わぬことを誓った。</div>
+    <style>
+    #textContainer {
+      position: absolute;
+      top: 33%;   /* 縦の中央 */
+      left: 50%;  /* 横の中央 */
+      width: 600px;
+      transform: translate(-50%, -50%); /* 要素を正確に中央に配置 */
+      text-align: center;  /* 内部の文字を中央揃え */
+      display: flex;  /* フレックスボックスを使用して横並びに */
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      text-align: left; /* テキストを左寄せにする */
+  }
+</style>
+  <!--<img id="content" src="media/example/日本語文2.png" />-->
   <div id="heatmapContainer"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.8.1/localforage.js"></script>
   <script src="webgazer.js"></script>
