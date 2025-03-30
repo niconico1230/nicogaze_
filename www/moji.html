@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>文字の位置取得</title>
+  <style>
+    #text {
+      font-size: 24px;
+      margin: 50px;
+    }
+  </style>
+</head>
+<body>
+  <div id="text">こんにちは、世界！</div>
+
+  <script>
+    const container = document.getElementById("text");
+    const text = container.textContent;
+
+    for (let i = 0; i < text.length; i++) {
+      const range = document.createRange();
+      range.setStart(container.firstChild, i);
+      range.setEnd(container.firstChild, i + 1);
+      const rect = range.getBoundingClientRect();
+
+      console.log(`文字: ${text[i]}, X: ${rect.left}, Y: ${rect.top}`);
+    }
+  </script>
+</body>
+</html>
