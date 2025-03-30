@@ -5,6 +5,7 @@ let recordingEnabled = false; // 記録管理用
 let recordedData = []; // 記録データ配列
 let currentClock = 0; // clock時間を保持する変数
 let startButtonCount = 0;   // 開始ボタンが押された回数
+let filenum=1;//ファイルの個数
 
 // ログのオン・オフを切り替える関数
 //function toggleLogging() {
@@ -15,20 +16,33 @@ let startButtonCount = 0;   // 開始ボタンが押された回数
 //}
 
 
-// 記録開始/停止ボタンの設定
-document.addEventListener("DOMContentLoaded", () => {
-document.getElementById('toggleRecordingBtn').addEventListener('click', () => {
-    recordingEnabled = !recordingEnabled;
-    document.getElementById('toggleRecordingBtn').textContent = recordingEnabled ? "記録停止" : "記録開始";
+// キー押下イベントをリッスン
+document.addEventListener('keydown', function(event) {
+    // "R" キーが押された場合に記録を開始/停止
+    if (event.key === "r" || event.key === "R") {
+        // 記録の開始/停止をトグル
+        recordingEnabled = !recordingEnabled;
 
+        // ボタンのテキストを更新（視覚的にわかりやすくするため）
+        document.getElementById('toggleRecordingBtn').textContent = recordingEnabled ? "記録停止" : "記録開始";
+ 
     // 記録開始時にデータをリセットし、定期保存を開始
     if (recordingEnabled) {
-        recordedData = [];
+        //recordedData = [];
+        recordedData.push([]); // 新しい記録データの配列を追加
+        startButtonCount++;
     } else {
          // 記録停止時に自動でデータ保存
-         saveDataToFile();
+         //saveDataToFile();
     }
-});
+}
+
+        // キー押下イベントをリッスン
+   // document.addEventListener('keydown', function(event) {
+        // "s" キーが押された場合に保存処理を実行
+        if (event.key === "s" || event.key === "S") {
+                saveDataToFile();
+        }
 });
 
 
@@ -44,7 +58,9 @@ window.onload = async function() {//ページが完全に読み込まれた後�
             currentClock = clock;
             
             if (data && recordingEnabled) {
-                recordedData.push({
+                let currentData = recordedData[recordedData.length - 1]; // 最新の記録データ配列
+                currentData.push({
+                //recordedData.push({
                     time: clock,
                     x: data.x,
                     y: data.y
@@ -71,11 +87,13 @@ window.onload = async function() {//ページが完全に読み込まれた後�
         .begin()
         //WebGazerを起動します。実行しないと何も始まりません。
 
-        webgazer.showVideoPreview(true) /*ブラウザ上に Webカメラの映像を表示するかどうか    shows all video previews */
-                .showPredictionPoints(false) /* ??視線予測の位置に 小さな四角形を100msごとに表示 shows a square every 100 milliseconds where current prediction is */
+        webgazer.showPredictionPoints(false) /* ??視線予測の位置に 小さな四角形を100msごとに表示 shows a square every 100 milliseconds where current prediction is */
+                .showVideoPreview(false) /*ブラウザ上に Webカメラの映像を表示するかどうか    shows all video previews */
                 .applyKalmanFilter(true); /*カルマンフィルターを有効化,視線予測のブレ（ノイズ）を軽減して、スムーズな動きを実現 Kalman Filter defaults to on. Can be toggled by user. */
 
         webgazer.addMouseEventListeners();
+
+    
 
     //Set up the webgazer video feedback.
     var setup = function() {
@@ -161,40 +179,76 @@ window.onbeforeunload = function() {
 }
 
 
-
-
 // データ保存
 function saveDataToFile() {
     if (recordedData.length === 0) {
+        console.log("保存前のデータ:", recordedData); // データの状態を確認
         alert("記録データがありません");
         return;
     }
+    
 
-    let content = "時間(ms), X座標, Y座標\n";
-    recordedData.forEach(data => {
-        content += `${data.time}, ${data.x}, ${data.y}\n`;
+    // xとyそれぞれのファイル内容を準備
+    let contentX = "";
+    let contentY = "";
+    
+    // 動的にヘッダーを作成x y
+    recordedData.forEach((_, index) => {
+        contentX += `x${index + 1},`;
+        contentY += `y${index + 1},`;
     });
+    contentX = contentX.slice(0, -1) + "\n"; // 最後のカンマを削除し改行
+    contentY = contentY.slice(0, -1) + "\n"; // 最後のカンマを削除し改行
 
-     // ファイル名に開始回数とタイムスタンプを追加
-     const filename = `gaze_data_${startButtonCount}.txt`;
+
+    // 最大データ数を取得
+    const maxLength = Math.max(...recordedData.map(recordSet => recordSet.length));
+
+    // 各行に対応するデータを挿入
+    for (let i = 0; i < maxLength; i++) {
+        recordedData.forEach(recordSet => {
+            if (recordSet[i]) {
+                contentX += `${recordSet[i].x},`; // x 座標
+                contentY += `${recordSet[i].y},`; // y 座標
+            } else {
+                contentX += ",,"; // データがない場合は空欄
+                contentY += ",,"; // データがない場合は空欄
+            }
+        });
+        contentX = contentX.slice(0, -1) + "\n"; // 最後のカンマを削除し改行
+        contentY = contentY.slice(0, -1) + "\n"; // 最後のカンマを削除し改行
+    }
+    // ファイル名に開始回数とタイムスタンプを追加
+    const filenameX = `gaze_data_x_${startButtonCount}_${filenum}.csv`; // x用のファイル名
+    const filenameY = `gaze_data_y_${startButtonCount}_${filenum}.csv`; // y用のファイル名
 
 
-    // テキストファイル生成
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
+    // x用ファイルの生成
+    const blobX = new Blob([contentX], { type: "text/csv" });
+    const urlX = URL.createObjectURL(blobX);
+    const aX = document.createElement("a");
+    aX.href = urlX;
+    aX.download = filenameX;
+    aX.click();
+    URL.revokeObjectURL(urlX); // リソース解放
 
-    // ダウンロードリンク作成
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
 
-    URL.revokeObjectURL(url); // リソース解放
+    // y用のファイルをダウンロード
+  
+    const blobY = new Blob([contentY], { type: "text/csv" });
+    const urlY = URL.createObjectURL(blobY);
+    const aY = document.createElement("a");
+    aY.href = urlY;
+    aY.download = filenameY;
+    aY.click();
+    URL.revokeObjectURL(urlY); // リソース解放
 
-    console.log("データが自動保存されました");
+    // ✅ データリセット処理を追加
+    recordedData = [];
+    startButtonCount = 0;
+    filenum+=1;
+    console.log("記録データがリセットされました");
 }
-
-
 
 
 

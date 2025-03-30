@@ -132,11 +132,11 @@ function calPointClick(node) {//5回クリックされたらそのポイント�
     }
 
     //Show the middle calibration point after all other points have been clicked.
-    if (PointCalibrate == 12){
+    if (PointCalibrate == 1){//16
         document.getElementById('Pt5').style.removeProperty('display');
     }
 
-    if (PointCalibrate >= 13){ // last point is calibrated
+    if (PointCalibrate >= 2){ //17 // last point is calibrated
         // grab every element in Calibration class and hide them except the middle point.
         document.querySelectorAll('.Calibration').forEach((i) => {
             i.style.setProperty('display', 'none');
