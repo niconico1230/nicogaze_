@@ -83,7 +83,7 @@ li {
 /* Calibration point position */
 #Pt1{
     top: 90px;/*70*/
-    left:340px;
+    left:25vw;
 }
 #Pt2{
     top: 90px;/*70*/
@@ -118,6 +118,8 @@ li {
     bottom:15vh;/*2vw*/
     right:25vw;/*2vw*/
 }
+
+
 #Pt10{/*中央上*/
     top: 30vh;/*70*/
     left:50vw;/*50vw*/
@@ -136,11 +138,33 @@ li {
     left:50vw;/*50vw*/
 }
 
-#toggleLoggingBtn {
+
+#Pt14{/*二段目左*/
+    top: 30vh;/*70*/
+    left:25vw;/*50vw*/
+}
+#Pt15{/*二段目右*/
+    top:30vh;/*50vh*/
+    right:25vw;/*2vw*/
+}
+#Pt16{/*四段目左*/
+    bottom:30vh;/*50vh*/
+    left:25vw;/*2vw*/
+}
+#Pt17{/*四段目右*/
+    bottom:30vh;/*2vw*/
+    right:25vw;;/*50vw*/
+}
+
+#toggleRecordingBtn {
     position: absolute;  /* 絶対位置指定 */
-    top: 20px;  /* 上から20px */
+    top: 140px;  /* 上から20px */
     right: 30px;  /* 右から60px */
     z-index: 1000;  /* 他の要素と重ならないように上に表示 */
+    width: 150px;  /* 幅を150pxに設定 */
+    height: 50px;  /* 高さを50pxに設定 */
+    font-size: 16px;  /* 文字のサイズを調整 */
+    color: #12e451;
 }
 
 #clearCanvasBtn{
@@ -150,6 +174,14 @@ li {
     z-index: 1000;  /* 他の要素と重ならないように上に表示 */
 }
 
+#downloadDataBtn{
+    position: absolute;  /* 絶対位置指定 */
+    top: 20px;  /* 上から20px */
+    right: 30px;  /* 右から60px */
+    z-index: 1000;  /* 他の要素と重ならないように上に表示 */
+}
+
+
 #clearHeatmapBtn{
     position: absolute;  /* 絶対位置指定 */
     top: 120px;  /* 上から20px */
@@ -157,15 +189,12 @@ li {
     z-index: 1000;  /* 他の要素と重ならないように上に表示 */
 }
 
-.char  {
-    font-size: 24px;
-    /*font-size: 10.5pt;*/
-    color: #333;
-    /*margin: 0 5px;*/
-}
+
+
 #textContainer {
     position: absolute;
-    top: 33%;   /* 縦の中央 */
+    font-size: 20pt; /* 文字サイズを10.5ポイントに設定 */
+    top: 45%;   /* 縦の中央 */
     left: 50%;  /* 横の中央 */
     width: 600px;
     transform: translate(-50%, -50%); /* 要素を正確に中央に配置 */
