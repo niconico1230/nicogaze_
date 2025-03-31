@@ -5,7 +5,7 @@ let recordingEnabled = false; // 記録管理用
 let recordedData = []; // 記録データ配列
 let currentClock = 0; // clock時間を保持する変数
 let startButtonCount = 0;   // 開始ボタンが押された回数
-let filenum=1;//ファイルの個数
+let filenum=0;//ファイルの個数
 
 // ログのオン・オフを切り替える関数
 //function toggleLogging() {
@@ -65,7 +65,8 @@ window.onload = async function() {//ページが完全に読み込まれた後�
                     x: data.x,
                     y: data.y
                 });
-                console.log("記録中 - 時間:", clock, " 視線位置:", "x:", data.x, "y:", data.y);
+                //console.log("記録中 - 時間:", clock, " 視線位置:", "x:", data.x, "y:", data.y);
+                console.log("記録中 :", startButtonCount, " 視線位置:", "x:", data.x, "y:", data.y);
             }
            // ログが有効な場合のみログを表示
            //if (data &&loggingEnabled) {
@@ -211,8 +212,8 @@ function saveDataToFile() {
                 contentX += `${recordSet[i].x},`; // x 座標
                 contentY += `${recordSet[i].y},`; // y 座標
             } else {
-                contentX += ",,"; // データがない場合は空欄
-                contentY += ",,"; // データがない場合は空欄
+                contentX += ","; // データがない場合は空白
+                contentY += ","; // データがない場合は空白
             }
         });
         contentX = contentX.slice(0, -1) + "\n"; // 最後のカンマを削除し改行
