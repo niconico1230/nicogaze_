@@ -97,8 +97,7 @@ function calcAccuracy() {//精度計算のための関数
                             //clear the calibration & hide the last middle button
                             ClearCanvas();
                             webgazer.removeMouseEventListeners();//学習をなくす　追加した
-                            //webgazer.setTraining(false);//学習をなくす　追加した
-                            //startDrawingGazePoints();// 視線描画を開始
+                            isTransparent=true;
                             
                         } else {
                             //use restart function to restart the calibration
@@ -132,11 +131,11 @@ function calPointClick(node) {//5回クリックされたらそのポイント�
     }
 
     //Show the middle calibration point after all other points have been clicked.
-    if (PointCalibrate == 16){//16
+    if (PointCalibrate == 1){//16
         document.getElementById('Pt5').style.removeProperty('display');
     }
 
-    if (PointCalibrate >= 17){ //17 // last point is calibrated
+    if (PointCalibrate >=2){ //17 // last point is calibrated
         // grab every element in Calibration class and hide them except the middle point.
         document.querySelectorAll('.Calibration').forEach((i) => {
             i.style.setProperty('display', 'none');

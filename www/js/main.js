@@ -6,6 +6,9 @@ let recordedData = []; // 記録データ配列
 let currentClock = 0; // clock時間を保持する変数
 let startButtonCount = 0;   // 開始ボタンが押された回数
 let filenum=0;//ファイルの個数
+// カーソル位置を記録する変数
+let cursorX = 0;
+let cursorY = 0;
 
 // ログのオン・オフを切り替える関数
 //function toggleLogging() {
@@ -45,6 +48,13 @@ document.addEventListener('keydown', function(event) {
         }
 });
 
+// マウス移動イベントをリッスン
+document.addEventListener('mousemove', function(event) {
+    cursorX = event.clientX;
+    cursorY = event.clientY;
+});
+
+
 
 window.onload = async function() {//ページが完全に読み込まれた後に実行される非同期関数。ここに WebGazer の起動や初期設定が含まれています。
  
@@ -63,10 +73,14 @@ window.onload = async function() {//ページが完全に読み込まれた後�
                 //recordedData.push({
                     time: clock,
                     x: data.x,
-                    y: data.y
+                    y: data.y,
+                    cursorX: cursorX, // カーソル位置X
+                    cursorY: cursorY,  // カーソル位置Y
+                    diffX: data.x - cursorX,
+                    diffY: data.y - cursorY
                 });
-                //console.log("記録中 - 時間:", clock, " 視線位置:", "x:", data.x, "y:", data.y);
-                console.log("記録中 :", startButtonCount, " 視線位置:", "x:", data.x, "y:", data.y);
+                //console.log("記録中 :", startButtonCount, " 視線位置:", "x:", data.x, "y:", data.y);
+                console.log("記録中:", startButtonCount,"時間：",clock, "視線位置:", "x:", data.x, "y:", data.y, "カーソル位置:", "x:", cursorX, "y:", cursorY);
             }
            // ログが有効な場合のみログを表示
            //if (data &&loggingEnabled) {
@@ -129,6 +143,8 @@ window.onload = async function() {//ページが完全に読み込まれた後�
 };
 
 let lastX = null, lastY = null; // 前回の座標を記録する変数
+let isTransparent = false; // 視線の色が透明かどうかを管理
+
 function displayGazePoint(x, y) {//視線を描画
     const canvas = document.getElementById("plotting_canvas");
     const context = canvas.getContext('2d');
@@ -142,8 +158,12 @@ function displayGazePoint(x, y) {//視線を描画
         context.beginPath();
         context.moveTo(lastX, lastY); // 前回の点から
         context.lineTo(x, y); // 現在の点まで線を引く
-        context.strokeStyle = 'rgba(92, 92, 202, 0.5)'; // 半透明の青
         context.lineWidth = 2; // 線の太さ
+        if (isTransparent) {
+            context.strokeStyle = 'rgba(0, 0, 0, 0)'; // 透明に設定
+        } else {
+            context.strokeStyle = 'rgba(92, 92, 202, 0.5)'; // 半透明の青
+        }
         context.stroke();
     }
 
@@ -151,7 +171,11 @@ function displayGazePoint(x, y) {//視線を描画
     // 視線位置に円を描画
     context.beginPath();
     context.arc(x, y, 3, 0, 2 * Math.PI); // 10pxの円を描画
-    context.fillStyle = 'rgba(92, 92, 202, 0.5)'; // (R,G,B,透明度), 0.3で薄め
+    if (isTransparent) {
+        context.fillStyle = 'rgba(0, 0, 0, 0)'; // 透明に設定
+    } else {
+        context.fillStyle = 'rgba(92, 92, 202, 0.5)'; // 半透明の青
+    }
     //context.fillStyle = 'blue'; // 円の色を赤に設定
     context.fill();
 
@@ -160,6 +184,7 @@ function displayGazePoint(x, y) {//視線を描画
     lastX = x;
     lastY = y;
 };
+
 
 // キャンバスをクリアする関数
 function clearScreen() {
@@ -183,7 +208,6 @@ window.onbeforeunload = function() {
 // データ保存
 function saveDataToFile() {
     if (recordedData.length === 0) {
-        console.log("保存前のデータ:", recordedData); // データの状態を確認
         alert("記録データがありません");
         return;
     }
@@ -193,10 +217,11 @@ function saveDataToFile() {
     let contentX = "";
     let contentY = "";
     
+    
     // 動的にヘッダーを作成x y
     recordedData.forEach((_, index) => {
-        contentX += `x${index + 1},`;
-        contentY += `y${index + 1},`;
+        contentX += `time${index + 1},x${index + 1},cursorX${index + 1},diffx${index + 1},`;
+        contentY += `time${index + 1},y${index + 1},cursorY${index + 1},diffy${index + 1}`;
     });
     contentX = contentX.slice(0, -1) + "\n"; // 最後のカンマを削除し改行
     contentY = contentY.slice(0, -1) + "\n"; // 最後のカンマを削除し改行
@@ -209,19 +234,19 @@ function saveDataToFile() {
     for (let i = 0; i < maxLength; i++) {
         recordedData.forEach(recordSet => {
             if (recordSet[i]) {
-                contentX += `${recordSet[i].x},`; // x 座標
-                contentY += `${recordSet[i].y},`; // y 座標
+                contentX += `${recordSet[i].time},${recordSet[i].x},${recordSet[i].cursorX},${recordSet[i].diffX},`; // x 座標 カーソルと差
+                contentY += `${recordSet[i].time},${recordSet[i].y},${recordSet[i].cursorY},${recordSet[i].diffY},`; // y 座標　カーソル
             } else {
-                contentX += ","; // データがない場合は空白
-                contentY += ","; // データがない場合は空白
+                contentX += ",,,,"; // データがない場合は空白
+                contentY += ",,,,"; // データがない場合は空白
             }
         });
         contentX = contentX.slice(0, -1) + "\n"; // 最後のカンマを削除し改行
         contentY = contentY.slice(0, -1) + "\n"; // 最後のカンマを削除し改行
     }
     // ファイル名に開始回数とタイムスタンプを追加
-    const filenameX = `gaze_data_x_${startButtonCount}_${filenum}.csv`; // x用のファイル名
-    const filenameY = `gaze_data_y_${startButtonCount}_${filenum}.csv`; // y用のファイル名
+    const filenameX = `gaze_mouse_x_${startButtonCount}_${filenum}.csv`; // x用のファイル名
+    const filenameY = `gaze_mouse_y_${startButtonCount}_${filenum}.csv`; // y用のファイル名
 
 
     // x用ファイルの生成
