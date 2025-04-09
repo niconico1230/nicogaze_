@@ -55,7 +55,6 @@ document.addEventListener('mousemove', function(event) {
 });
 
 
-
 window.onload = async function() {//ページが完全に読み込まれた後に実行される非同期関数。ここに WebGazer の起動や初期設定が含まれています。
  
     ///start the webgazer tracker
@@ -63,6 +62,7 @@ window.onload = async function() {//ページが完全に読み込まれた後�
         //他にも 'weightedRidge' や 'threadedRidge' なども選べます
         //.setTracker('clmtrackr')
         .setGazeListener(function(data, clock) {//視線追跡
+
             
             // clockの時間を保持
             currentClock = clock;
@@ -95,6 +95,7 @@ window.onload = async function() {//ページが完全に読み込まれた後�
              displayGazePoint(data.x, data.y); //視線移動を持続的に可視化したいならここ・・・
 
         }
+    
         })
         .saveDataAcrossSessions(true)//true にするとユーザーの視線データやキャリブレーションの進捗が ブラウザに保存されます
         //ページを再読み込みしてもデータが保持されます（localStorageやIndexedDB経由）
