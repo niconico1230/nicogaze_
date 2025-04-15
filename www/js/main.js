@@ -10,6 +10,7 @@ let filenum=0;//ファイルの個数
 let cursorX = 0;
 let cursorY = 0;
 
+
 // ログのオン・オフを切り替える関数
 //function toggleLogging() {
   //  loggingEnabled = !loggingEnabled;
@@ -36,16 +37,16 @@ document.addEventListener('keydown', function(event) {
         startButtonCount++;
     } else {
          // 記録停止時に自動でデータ保存
-         //saveDataToFile();
+         saveDataToFile();
     }
 }
 
         // キー押下イベントをリッスン
    // document.addEventListener('keydown', function(event) {
         // "s" キーが押された場合に保存処理を実行
-        if (event.key === "s" || event.key === "S") {
-                saveDataToFile();
-        }
+        //if (event.key === "s" || event.key === "S") {
+           //     saveDataToFile();
+        //}
 });
 
 // マウス移動イベントをリッスン
@@ -61,12 +62,25 @@ window.onload = async function() {//ページが完全に読み込まれた後�
     await webgazer.setRegression('ridge') /* 回帰モデルの設定：'ridge' は視線を予測するためのアルゴリズム（回帰モデル）currently must set regression and tracker */
         //他にも 'weightedRidge' や 'threadedRidge' なども選べます
         //.setTracker('clmtrackr')
-        .setGazeListener(function(data, clock) {//視線追跡
+        .saveDataAcrossSessions(true)//true にするとユーザーの視線データやキャリブレーションの進捗が ブラウザに保存されます
+        //ページを再読み込みしてもデータが保持されます（localStorageやIndexedDB経由）
+        //クリックしたときのみデータが来ていた
+        .begin()
+        //WebGazerを起動します。実行しないと何も始まりません。
 
-            
+        webgazer.showPredictionPoints(false) /* ??視線予測の位置に 小さな四角形を100msごとに表示 shows a square every 100 milliseconds where current prediction is */
+                .showVideoPreview(true) /*ブラウザ上に Webカメラの映像を表示するかどうか    shows all video previews */
+                .applyKalmanFilter(true); /*カルマンフィルターを有効化,視線予測のブレ（ノイズ）を軽減して、スムーズな動きを実現 Kalman Filter defaults to on. Can be toggled by user. */
+
+        webgazer.addMouseEventListeners();
+        
+    
+        webgazer.setGazeListener( function(data, clock) {//視線追跡
             // clockの時間を保持
             currentClock = clock;
             
+         
+
             if (data && recordingEnabled) {
                 let currentData = recordedData[recordedData.length - 1]; // 最新の記録データ配列
                 currentData.push({
@@ -95,20 +109,8 @@ window.onload = async function() {//ページが完全に読み込まれた後�
              displayGazePoint(data.x, data.y); //視線移動を持続的に可視化したいならここ・・・
 
         }
-    
+
         })
-        .saveDataAcrossSessions(true)//true にするとユーザーの視線データやキャリブレーションの進捗が ブラウザに保存されます
-        //ページを再読み込みしてもデータが保持されます（localStorageやIndexedDB経由）
-        //クリックしたときのみデータが来ていた
-        .begin()
-        //WebGazerを起動します。実行しないと何も始まりません。
-
-        webgazer.showPredictionPoints(false) /* ??視線予測の位置に 小さな四角形を100msごとに表示 shows a square every 100 milliseconds where current prediction is */
-                .showVideoPreview(false) /*ブラウザ上に Webカメラの映像を表示するかどうか    shows all video previews */
-                .applyKalmanFilter(true); /*カルマンフィルターを有効化,視線予測のブレ（ノイズ）を軽減して、スムーズな動きを実現 Kalman Filter defaults to on. Can be toggled by user. */
-
-        webgazer.addMouseEventListeners();
-
     
 
     //Set up the webgazer video feedback.
@@ -135,6 +137,7 @@ window.onload = async function() {//ページが完全に読み込まれた後�
         // 現在の `clock` を取得
         //console.log('クリックした時間: ', currentClock);
         console.log('%cクリックした時間: %s', 'color: red; font-weight: bold; font-size: 13px;', currentClock);
+        
     });
 
      // キャンバスクリアボタンの設定
@@ -142,6 +145,31 @@ window.onload = async function() {//ページが完全に読み込まれた後�
      clearButton.addEventListener("click", clearScreen);
 
 };
+
+// 🔽 ここに関数を追加！ 🔽
+function getEyelidFeatures(faceLandmarks) {
+    // 左目の瞼のポイント
+    const leftEyelid = [
+        faceLandmarks[159], faceLandmarks[145]  // 左瞼の特徴点
+    ];
+    // 右目の瞼のポイント
+    const rightEyelid = [
+        faceLandmarks[386], faceLandmarks[374] // 右瞼の特徴点
+    ];
+    return  {
+        leftEyelid: leftEyelid.map(point => ({ x: point[0], y: point[1] })),
+        rightEyelid: rightEyelid.map(point => ({ x: point[0], y: point[1] }))
+    };
+}
+function getEyeOpenness(eyelidPoints) {
+    const top = eyelidPoints[0];
+    const bottom = eyelidPoints[1];
+    const dx = top.x - bottom.x;
+    const dy = top.y - bottom.y;
+    return Math.sqrt(dx * dx + dy * dy);  // 上下の距離（ユークリッド距離）
+}
+
+
 
 let lastX = null, lastY = null; // 前回の座標を記録する変数
 let isTransparent = false; // 視線の色が透明かどうかを管理
