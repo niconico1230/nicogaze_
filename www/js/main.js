@@ -9,6 +9,9 @@ let filenum=0;//ファイルの個数
 // カーソル位置を記録する変数
 let cursorX = 0;
 let cursorY = 0;
+let lastOpenness = null;//上瞼と下瞼の差（右目）
+let isBlinking=0; // グローバルスコープで定義（数値で管理）
+
 
 
 // ログのオン・オフを切り替える関数
@@ -79,7 +82,6 @@ window.onload = async function() {//ページが完全に読み込まれた後�
             // clockの時間を保持
             currentClock = clock;
             
-         
 
             if (data && recordingEnabled) {
                 let currentData = recordedData[recordedData.length - 1]; // 最新の記録データ配列
@@ -91,7 +93,9 @@ window.onload = async function() {//ページが完全に読み込まれた後�
                     cursorX: cursorX, // カーソル位置X
                     cursorY: cursorY,  // カーソル位置Y
                     diffX: data.x - cursorX,
-                    diffY: data.y - cursorY
+                    diffY: data.y - cursorY,
+                    blink: isBlinking, // 👈 ここ追加 1がまばたき
+                    openness: lastOpenness // ← ここで保持して保存
                 });
                 //console.log("記録中 :", startButtonCount, " 視線位置:", "x:", data.x, "y:", data.y);
                 console.log("記録中:", startButtonCount,"時間：",clock, "視線位置:", "x:", data.x, "y:", data.y, "カーソル位置:", "x:", cursorX, "y:", cursorY);
@@ -106,8 +110,9 @@ window.onload = async function() {//ページが完全に読み込まれた後�
             //console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
           // }
            if (data && data.x && data.y) {
+            if(!isTransparent){
              displayGazePoint(data.x, data.y); //視線移動を持続的に可視化したいならここ・・・
-
+           }
         }
 
         })
@@ -166,7 +171,16 @@ function getEyeOpenness(eyelidPoints) {
     const bottom = eyelidPoints[1];
     const dx = top.x - bottom.x;
     const dy = top.y - bottom.y;
-    return Math.sqrt(dx * dx + dy * dy);  // 上下の距離（ユークリッド距離）
+    const result = Math.sqrt(dx * dx + dy * dy);
+    lastOpenness = result; // 👈 グローバル変数に保持（ただしあまり推奨しない）
+    if(lastOpenness<5.0){
+        isBlinking=1;//まばたき
+    }
+    else{
+        isBlinking=0;//のっとまばたき
+    }
+
+    return result;  // 上下の距離（ユークリッド距離）
 }
 
 
@@ -188,11 +202,7 @@ function displayGazePoint(x, y) {//視線を描画
         context.moveTo(lastX, lastY); // 前回の点から
         context.lineTo(x, y); // 現在の点まで線を引く
         context.lineWidth = 2; // 線の太さ
-        if (isTransparent) {
-            context.strokeStyle = 'rgba(0, 0, 0, 0)'; // 透明に設定
-        } else {
-            context.strokeStyle = 'rgba(92, 92, 202, 0.5)'; // 半透明の青
-        }
+        context.strokeStyle = 'rgba(92, 92, 202, 0.5)'; // 半透明の青
         context.stroke();
     }
 
@@ -201,7 +211,7 @@ function displayGazePoint(x, y) {//視線を描画
     context.beginPath();
     context.arc(x, y, 3, 0, 2 * Math.PI); // 10pxの円を描画
     if (isTransparent) {
-        context.fillStyle = 'rgba(0, 0, 0, 0)'; // 透明に設定
+        context.fillStyle = 'rgba(216, 64, 64, 0.7)'; // 透明に設定
     } else {
         context.fillStyle = 'rgba(92, 92, 202, 0.5)'; // 半透明の青
     }
@@ -249,8 +259,8 @@ function saveDataToFile() {
     
     // 動的にヘッダーを作成x y
     recordedData.forEach((_, index) => {
-        contentX += `time${index + 1},x${index + 1},cursorX${index + 1},diffx${index + 1},`;
-        contentY += `time${index + 1},y${index + 1},cursorY${index + 1},diffy${index + 1}`;
+        contentX += `time${index + 1},x${index + 1},cursorX${index + 1},diffx${index + 1},blink${index + 1},openness${index + 1},`;
+        contentY += `time${index + 1},y${index + 1},cursorY${index + 1},diffy${index + 1},blink${index + 1},openness${index + 1},`;
     });
     contentX = contentX.slice(0, -1) + "\n"; // 最後のカンマを削除し改行
     contentY = contentY.slice(0, -1) + "\n"; // 最後のカンマを削除し改行
@@ -263,11 +273,11 @@ function saveDataToFile() {
     for (let i = 0; i < maxLength; i++) {
         recordedData.forEach(recordSet => {
             if (recordSet[i]) {
-                contentX += `${recordSet[i].time},${recordSet[i].x},${recordSet[i].cursorX},${recordSet[i].diffX},`; // x 座標 カーソルと差
-                contentY += `${recordSet[i].time},${recordSet[i].y},${recordSet[i].cursorY},${recordSet[i].diffY},`; // y 座標　カーソル
+                contentX += `${recordSet[i].time},${recordSet[i].x},${recordSet[i].cursorX},${recordSet[i].diffX},${recordSet[i].blink},${recordSet[i].openness},`; // x 座標 カーソルと差
+                contentY += `${recordSet[i].time},${recordSet[i].y},${recordSet[i].cursorY},${recordSet[i].diffY},${recordSet[i].blink},${recordSet[i].openness},`; // y 座標　カーソル
             } else {
-                contentX += ",,,,"; // データがない場合は空白
-                contentY += ",,,,"; // データがない場合は空白
+                contentX += ",,,,,,"; // データがない場合は空白
+                contentY += ",,,,,,"; // データがない場合は空白
             }
         });
         contentX = contentX.slice(0, -1) + "\n"; // 最後のカンマを削除し改行
