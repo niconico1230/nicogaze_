@@ -87,7 +87,7 @@ Instructions on use can be found in the README repository.
             <!-- Modal content-->
             <div class="modal-content">
               <div class="modal-body">
-                <img src="media/example/calibration.png" width="100%" height="100%" alt="webgazer demo instructions"></img>
+                <img src="media/example/calibration.png" style="max-width: 100%; height: auto;" alt="webgazer demo instructions"></img>
               </div><!--「使い方」画像を表示-->
                <div class="modal-footer">
                 <button id="closeBtn" type="button" class="btn btn-default" data-bs-dismiss="modal">Close & load saved model </button>
@@ -103,18 +103,6 @@ Instructions on use can be found in the README repository.
         <!-- Latest compiled JavaScript -->
         <script src="./js/resize_canvas.js"></script>
         <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-        <!--<script>
-          const container = document.getElementById("text");
-          const text = container.textContent;
-      
-          for (let i = 0; i < text.length; i++) {
-            const range = document.createRange();
-            range.setStart(container.firstChild, i);
-            range.setEnd(container.firstChild, i + 1);
-            const rect = range.getBoundingClientRect();
-      
-            console.log(`文字: ${text[i]} X: ${rect.left} Y: ${rect.top}`);
-          }
-        </script> -->
+        
     </body>
 </html>
