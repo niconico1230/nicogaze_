@@ -203,3 +203,8 @@ li {
     overflow-wrap: break-word;
     text-align: left; /* テキストを左寄せにする */
 }
+
+.modal-dialog {
+    max-width: 60vw; /* 画面幅の60%に制限 */
+    width: auto;
+  }
