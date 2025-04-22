@@ -11,6 +11,7 @@ let cursorX = 0;
 let cursorY = 0;
 let lastOpenness = null;//上瞼と下瞼の差（右目）
 let isBlinking=0; // グローバルスコープで定義（数値で管理）
+let lasttime=null;
 
 
 
@@ -38,9 +39,11 @@ document.addEventListener('keydown', function(event) {
         //recordedData = [];
         recordedData.push([]); // 新しい記録データの配列を追加
         startButtonCount++;
+        console.log("ーー記録開始ーー");
     } else {
          // 記録停止時に自動でデータ保存
          saveDataToFile();
+         console.log("ーー記録停止ーー");
     }
 }
 
@@ -81,8 +84,16 @@ window.onload = async function() {//ページが完全に読み込まれた後�
         webgazer.setGazeListener( function(data, clock) {//視線追跡
             // clockの時間を保持
             currentClock = clock;
-            
+            // 開始時間の記録
+            const start = performance.now();
+            if (lasttime !== null) {
+                const interval = start - lasttime;
+                console.log(`⏱ WebGazer 更新間隔: ${interval.toFixed(5)} ms`);
+            }
+        
+            lasttime =start;
 
+            
             if (data && recordingEnabled) {
                 let currentData = recordedData[recordedData.length - 1]; // 最新の記録データ配列
                 currentData.push({
@@ -97,24 +108,15 @@ window.onload = async function() {//ページが完全に読み込まれた後�
                     blink: isBlinking, // 👈 ここ追加 1がまばたき
                     openness: lastOpenness // ← ここで保持して保存
                 });
-                //console.log("記録中 :", startButtonCount, " 視線位置:", "x:", data.x, "y:", data.y);
-                console.log("記録中:", startButtonCount,"時間：",clock, "視線位置:", "x:", data.x, "y:", data.y, "カーソル位置:", "x:", cursorX, "y:", cursorY);
+                //console.log("記録中:", startButtonCount,"時間：",clock, "視線位置:", "x:", data.x, "y:", data.y, "カーソル位置:", "x:", cursorX, "y:", cursorY);
             }
-           // ログが有効な場合のみログを表示
-           //if (data &&loggingEnabled) {
-            //console.log("経過時間(ms):", clock,"  視線位置:","x " ,data.x,"y ", data.y,);
-            //console.log("経過時間(ms):", clock);
-            //data には {x, y} 座標（視線の位置）が入ってる 下のコメントアウトを外せばログをとったり描画できる
-           //  console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
-          //clock は WebGazer 開始からの経過時間（ミリ秒）
-            //console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
-          // }
+           
            if (data && data.x && data.y) {
             if(!isTransparent){
              displayGazePoint(data.x, data.y); //視線移動を持続的に可視化したいならここ・・・
            }
         }
-
+        
         })
     
 
@@ -222,6 +224,7 @@ function displayGazePoint(x, y) {//視線を描画
     // 現在の座標を保存（次の描画時に使用）
     lastX = x;
     lastY = y;
+
 };
 
 
