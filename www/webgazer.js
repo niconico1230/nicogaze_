@@ -14050,7 +14050,7 @@ const eyelidInfo = getEyelidFeatures(this.positionsArray);
 // 取得した瞼の位置情報をログに出力
 //console.log("左瞼: ", eyelidInfo.leftEyelid);console.log("右瞼: ", eyelidInfo.rightEyelid);
 const openness1 = getEyeOpenness(eyelidInfo.rightEyelid);
-        console.log(openness1);
+        //console.log(openness1);
         if(openness1<5.0){ console.log("瞬き"); }
         //↑↑↑の基準を変えるなら、mainも書き換える必要がある
 
