@@ -12,7 +12,8 @@ let cursorY = 0;
 let lastOpenness = null;//上瞼と下瞼の差（右目）
 let isBlinking=0; // グローバルスコープで定義（数値で管理）
 let lasttime=null;
-
+let wordData = {}; // kopasu.jsonのデータを格納する変数
+let tokenizer = null;//kuromojiに使用
 
 
 // ログのオン・オフを切り替える関数
@@ -22,6 +23,69 @@ let lasttime=null;
     //const button = document.getElementById('toggleLoggingBtn');
     //button.textContent = loggingEnabled ? 'ログを停止' : 'ログを開始';
 //}
+
+// 記録データを保存する関数
+async function loadKopasuData() {
+    try {
+        const response = await fetch('js/word_index_long.json');  // kopasu.jsonファイルを取得
+        const data = await response.json();  // JSONデータをパース
+        wordData = data;  // JSONデータをwordDataに格納
+        console.log("word_index_long.json が正常にロードされました");
+    } catch (error) {
+        console.error("word_index_long.jsonの読み込みに失敗しました:", error);
+    }
+}
+// "m" キーで特定の単語と品詞を検索
+document.addEventListener('keydown', function(event) {
+    if (event.key === "m" || event.key === "M") {
+        // 例えば「に 助詞」を検索
+        const word = "う";
+        const pos = "感動詞";
+        searchWordAndPOS(word, pos);
+    }
+});
+// "m" キーで特定の単語と品詞を検索
+document.addEventListener('keydown', function(event) {
+    if (event.key === "n" || event.key === "N") {
+        // 例えば「に 助詞」を検索
+        const word = "Ｖ・Ｏ";
+        const pos = "名詞";
+        searchWordAndPOS(word, pos);
+    }
+});
+
+
+
+function initKuromoji() {
+    kuromoji.builder({ dicPath: "https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/" }).build((err, builtTokenizer) => {
+        if (err) {
+            console.error("エラー:", err);
+            return;
+        }
+        // トークナイザーが無事に初期化されました
+        console.log("Kuromojiが初期化されました");
+        tokenizer = builtTokenizer;
+    });
+}
+document.addEventListener('keydown', function(event) {
+    if (event.key === "l" || event.key === "L") {
+        if (!tokenizer) {
+            console.warn("⚠️ Kuromojiの初期化がまだ完了していません");
+            return;
+        }
+        const text = "明日は晴れると思われる。気温は25度になるでしょう。";
+        const tokens = tokenizer.tokenize(text);
+
+         // 結果を表示（tokenごとの表記と品詞）
+     
+         tokens.forEach(token => {
+            console.log(`単語: ${token.basic_form}, 品詞: ${token.pos}`);
+         });
+
+        analyzeGazeText(cursorX, cursorY); // カーソル位置でテキスト解析
+        // もし視線位置で解析したい場合は recordedData などから最新データを取得して渡す
+    }
+});
 
 
 // キー押下イベントをリッスン
@@ -39,11 +103,12 @@ document.addEventListener('keydown', function(event) {
         //recordedData = [];
         recordedData.push([]); // 新しい記録データの配列を追加
         startButtonCount++;
-        console.log("ーー記録開始ーー");
+        console.log("ーー記録開始",startButtonCount,"ーー");
+
     } else {
          // 記録停止時に自動でデータ保存
          saveDataToFile();
-         console.log("ーー記録停止ーー");
+         console.log("ーー記録停止",startButtonCount,"ーー");
     }
 }
 
@@ -79,7 +144,15 @@ window.onload = async function() {//ページが完全に読み込まれた後�
                 .applyKalmanFilter(true); /*カルマンフィルターを有効化,視線予測のブレ（ノイズ）を軽減して、スムーズな動きを実現 Kalman Filter defaults to on. Can be toggled by user. */
 
         webgazer.addMouseEventListeners();
-        
+          // kopasu.jsonのデータを読み込む
+          await loadKopasuData();
+
+          if (typeof kuromoji === "undefined") {
+            console.error("❌ kuromojiが読み込まれていません。スクリプトの順序を確認してください。");
+        } else {
+            initKuromoji(); // 直接初期化
+        }
+
     
         webgazer.setGazeListener( function(data, clock) {//視線追跡
             // clockの時間を保持
@@ -88,7 +161,7 @@ window.onload = async function() {//ページが完全に読み込まれた後�
             const start = performance.now();
             if (lasttime !== null) {
                 const interval = start - lasttime;
-                console.log(`⏱ WebGazer 更新間隔: ${interval.toFixed(5)} ms`);
+                //console.log(`⏱ WebGazer 更新間隔: ${interval.toFixed(5)} ms`);
             }
         
             lasttime =start;
@@ -152,6 +225,10 @@ window.onload = async function() {//ページが完全に読み込まれた後�
      clearButton.addEventListener("click", clearScreen);
 
 };
+
+
+
+
 
 // 🔽 ここに関数を追加！ 🔽
 function getEyelidFeatures(faceLandmarks) {
@@ -226,6 +303,47 @@ function displayGazePoint(x, y) {//視線を描画
     lastY = y;
 
 };
+
+
+
+// 単語と品詞を検索する関数
+function searchWordAndPOS(word, pos) {
+    const key = `[\"${word}\", \"${pos}\"]`;  // 検索するキーを作成
+    if (wordData[key]) {
+        console.log(`単語「${word}」、品詞「${pos}」が見つかりました。`);
+        console.log(`Frequency: ${wordData[key].frequency}, PMW: ${wordData[key].pmw}`);
+        return wordData[key];  // 見つかったデータを返す
+    } else {
+        console.log(`単語「${word}」、品詞「${pos}」はword_index_long.jsonに存在しません。`);
+        return null;
+    }
+}
+
+function analyzeGazeText(x, y) {
+    if (!tokenizer) {
+        console.warn("⚠️ kuromojiがまだ初期化されていません");
+        return;
+    }
+
+    const element = document.elementFromPoint(x, y);
+    if (element && element.innerText) {
+        const rawText = element.innerText.trim();
+        if (rawText === "") return;
+
+        const tokens = tokenizer.tokenize(rawText);
+        const result = tokens.map(token => `${token.surface_form} [${token.pos}]`).join(", ");
+
+        console.log(`🎯 視線位置のテキスト: "${rawText}"`);
+        console.log(`🔍 形態素解析: ${result}`);
+
+        // 任意：HTML表示
+        const outputEl = document.getElementById("output");
+        if (outputEl) outputEl.innerText = result;
+    }
+}
+
+
+
 
 
 // キャンバスをクリアする関数
