@@ -16,12 +16,14 @@ Instructions on use can be found in the README repository.
         <link rel="stylesheet" type="text/css" href="./css/style.css">
         <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
         <!-- <script src="./tensorflow.js"></script> -->
-        <script src="./webgazer.js"></script>
-    </head>
+       
+      </head>
     <body LANG="en-US" LINK="#0000ff" DIR="LTR">
       <canvas id="plotting_canvas" width="500" height="500" style="cursor:crosshair;"></canvas>
       <!--**視線の予測ポイント（注視点）**を描画するキャンバス-->
-
+        <script src="https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js"></script>
+        <script src="./webgazer.js"></script>
+    
         <script src="./node_modules/sweetalert/dist/sweetalert.min.js"></script>
 
         <script src="./js/main.js"></script>
@@ -29,6 +31,7 @@ Instructions on use can be found in the README repository.
         <script src="./js/precision_calculation.js"></script>
         <script src="./js/precision_store_points.js"></script>
 
+      
         <!--ナビゲーションバーの基本構文-->
         <nav id="webgazerNavbar" class="navbar navbar-expand-lg navbar-default navbar-fixed-top">
           <div class="container-fluid">
