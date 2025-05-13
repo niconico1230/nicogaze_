@@ -76,16 +76,16 @@ function calcAccuracy() {//精度計算のための関数
                     }
                 }).then(isConfirm => {
                   const container = document.getElementById("textContainer");
-                  container.style.display = "block";  // テキストを表示
+                  //container.style.display = "block";  // テキストを表示
 
                       const text = container.textContent;
                     
                       for (let i = 0; i < text.length; i++) {
-                        const range = document.createRange();
-                        range.setStart(container.firstChild, i);
-                        range.setEnd(container.firstChild, i + 1);
+                    const range = document.createRange();
+                      range.setStart(container.firstChild, i);
+                       range.setEnd(container.firstChild, i + 1);
                         const rect = range.getBoundingClientRect();
-                        // 中心座標を計算
+                         中心座標を計算
                         const centerX = rect.left + rect.width / 2;
                         const centerY = rect.top + rect.height / 2;
                     
@@ -98,6 +98,7 @@ function calcAccuracy() {//精度計算のための関数
                             ClearCanvas();
                             webgazer.removeMouseEventListeners();//学習をなくす　追加した
                             isTransparent=true;
+                            
                             
                         } else {
                             //use restart function to restart the calibration
