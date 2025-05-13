@@ -80,10 +80,12 @@ li {
     position:fixed;
 }
 
-/* Calibration point position */
+
+/*キャリブレーションポイント*/
+
 #Pt1{
     top: 90px;/*70*/
-    left:25vw;
+    left:20vw;
 }
 #Pt2{
     top: 90px;/*70*/
@@ -92,11 +94,11 @@ li {
 }
 #Pt3{
     top: 90px;/*70*/
-    right:25vw;/*2vw*/
+    right:20vw;/*2vw*/
 }
 #Pt4{
     top:50vh;/*50vh*/
-    left:25vw;/*2vw*/
+    left:20vw;/*2vw*/
 }
 #Pt5{
     top: 50vh;/*50vh*/
@@ -104,11 +106,11 @@ li {
 }
 #Pt6{
     top: 50vh;/*50vh*/
-    right:25vw;/*2vw*/
+    right:20vw;/*2vw*/
 }
 #Pt7{
     bottom:15vh;/*2vw*/
-    left: 25vw;/*2vw*/
+    left: 20vw;/*2vw*/
 }
 #Pt8{
     bottom:15vh;/*2vw*/
@@ -116,7 +118,7 @@ li {
 }
 #Pt9{
     bottom:15vh;/*2vw*/
-    right:25vw;/*2vw*/
+    right:20vw;/*2vw*/
 }
 
 
@@ -141,20 +143,23 @@ li {
 
 #Pt14{/*二段目左*/
     top: 30vh;/*70*/
-    left:25vw;/*50vw*/
+    left:20vw;/*50vw*/
 }
 #Pt15{/*二段目右*/
     top:30vh;/*50vh*/
-    right:25vw;/*2vw*/
+    right:20vw;/*2vw*/
 }
 #Pt16{/*四段目左*/
     bottom:30vh;/*50vh*/
-    left:25vw;/*2vw*/
+    left:20vw;/*2vw*/
 }
 #Pt17{/*四段目右*/
     bottom:30vh;/*2vw*/
-    right:25vw;;/*50vw*/
+    right:20vw;;/*50vw*/
 }
+
+
+
 
 #toggleRecordingBtn {
     position: absolute;  /* 絶対位置指定 */
@@ -193,7 +198,7 @@ li {
 #textContainer {
     position: absolute;
     font-size: 20pt; /* 文字サイズを設定 */
-    top: 35%;   /* 縦の中央 */
+    top: 46%;   /* 縦の中央 */
     left: 50%;  /* 横の中央 */
     width: 700px;
     transform: translate(-50%, -50%); /* 要素を正確に中央に配置 */
