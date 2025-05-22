@@ -22,6 +22,11 @@ button {
     z-index: 1;
 }
 
+html body #webgazerVideoContainer {
+    width: 160px !important; /* 新しい値 */
+    height: 120px !important; /* 新しい値 */
+}
+
 /* Navbar styling */
 #webgazerNavbar {
     left: 320px;
@@ -164,16 +169,16 @@ li {
 #toggleRecordingBtn {
     position: absolute;  /* 絶対位置指定 */
     top: 20px;  /* 上から20px */
-    right: 20px;  /* 右から60px */
+    right: 160px;  /* 右から60px */
     z-index: 1000;  /* 他の要素と重ならないように上に表示 */
-    width: 90px;  /* 幅を150pxに設定 */
+    width: 80px;  /* 幅を150pxに設定 */
     height: 30px;  /* 高さを50pxに設定 */
     font-size: 16px;  /* 文字のサイズを調整 */
 }
 
 #clearCanvasBtn{
     position: absolute;  /* 絶対位置指定 */
-    top: 70px;  /* 上から20px */
+    top: 20px;  /* 上から20px */
     right: 30px;  /* 右から60px */
     z-index: 1000;  /* 他の要素と重ならないように上に表示 */
 }
@@ -209,7 +214,19 @@ li {
     text-align: left; /* テキストを左寄せにする */
 }
 
+.custom-hello {
+  white-space: pre-wrap;
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20pt;
+  color: black;
+  z-index: 9999;
+}
+
+
 .modal-dialog {
-    max-width: 60vw; /* 画面幅の60%に制限 */
+    /*max-width: 80vw; /* 画面幅の60%に制限 */
     width: auto;
   }
