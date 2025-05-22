@@ -4,6 +4,7 @@ var CalibrationPoints={};//それぞれのキャリブレーションポイン�
 // Find the help modal
 var helpModal;//ヘルプモーダルを表示するための変数ですが、実際にモーダルを操作する際に初期化されます
 
+let helloText = document.createElement('div');//文字出力
 
 /**
  * Clear the canvas and the calibration button.
@@ -25,8 +26,8 @@ function ClearCanvas(){
 function PopUpInstruction(){
   ClearCanvas();
   swal({
-    title:"Calibration",
-    text: "Please click on each of the 9 points on the screen. You must click on each point 5 times till it goes yellow. This will calibrate your eye movements.",
+    title:"キャリブレーション",
+    text: "背景の下にあるバーが上に上がったらokを押し、キャリブレーションを開始してください。",
     buttons:{
       cancel: false,
       confirm: true
@@ -50,8 +51,8 @@ function calcAccuracy() {//精度計算のための関数
     // show modal
     // notification for the measurement process
     swal({
-        title: "Calculating measurement",
-        text: "Please don't move your mouse & stare at the middle dot for the next 5 seconds. This will allow us to calculate the accuracy of our predictions.",
+        title: "キャリブレーション精度の測定",
+        text: "体勢を変えず、真ん中の点を5秒間見つめてください。",
         closeOnEsc: false,// ESCキーでモーダルを閉じられないように設定
         allowOutsideClick: false,// モーダルの外側をクリックして閉じられないように設定
         closeModal: true // モーダルが閉じる際に特別な処理が必要な場合（実行するかどうかのフラグ）
@@ -94,10 +95,18 @@ function calcAccuracy() {//精度計算のための関数
                     //});
 
                         if (isConfirm){
+                       // メール送信
+
+                       
                             //clear the calibration & hide the last middle button
                             ClearCanvas();
                             webgazer.removeMouseEventListeners();//学習をなくす　追加した
                             isTransparent=true;
+
+                            
+                            helloText.className = 'custom-hello';
+                            helloText.textContent = 'これから文章を読んでもらいます。\n頭を動かさず、指示をお待ちください';
+                            document.body.appendChild(helloText);
                             
                             
                         } else {
@@ -136,7 +145,7 @@ function calPointClick(node) {//5回クリックされたらそのポイント�
         document.getElementById('Pt5').style.removeProperty('display');
     }
 
-    if (PointCalibrate >=2){ //17 // last point is calibrated
+    if (PointCalibrate >= 2){ //17 // last point is calibrated
         // grab every element in Calibration class and hide them except the middle point.
         document.querySelectorAll('.Calibration').forEach((i) => {
             i.style.setProperty('display', 'none');
