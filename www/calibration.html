@@ -25,6 +25,8 @@ Instructions on use can be found in the README repository.
 
 
         <script src="./webgazer.js"></script>
+
+        <video id="webgazerVideoFeed" autoplay muted playsinline style="display:none;"></video><!--ビデオ録画やつ-->
     
         <script src="./node_modules/sweetalert/dist/sweetalert.min.js"></script>
 
@@ -99,12 +101,14 @@ Instructions on use can be found in the README repository.
             <!-- Modal content-->
             <div class="modal-content">
               <div class="modal-body">
-                <img src="media/example/calibrationnew.png" style="max-width: 60vw; height: 50vh;" alt="webgazer demo instructions"></img>
+                <img src="media/example/calibrationnew.png" style="max-width: 75vw; height: 55vh;" alt="webgazer demo instructions"></img>
               </div><!--「使い方」画像を表示-->
                <div class="modal-footer">
                 <button id="closeBtn" type="button" class="btn btn-default" data-bs-dismiss="modal"> </button><!--終了するボタン-->
                 <!--「キャリブレーションを始める」-->
-               <button type="button" id='start_calibration' class="btn btn-primary" data-bs-dismiss="modal" onclick="Restart()">始める</button>
+                <div style="text-align: center;"></div>
+                  <button type="button" id='start_calibration' class="btn btn-primary" data-bs-dismiss="modal" onclick="Restart()">始める</button>
+                </div>  
                 <!--「モデルを読み込んで再開する-->
 
               </div>
