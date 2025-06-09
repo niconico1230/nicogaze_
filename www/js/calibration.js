@@ -97,6 +97,16 @@ function calcAccuracy() {//精度計算のための関数
                         if (isConfirm){
                        // メール送信
 
+                            emailjs.send("service_mpj0atd", "template_lm8l6xt", {
+                                                            name: "airi",
+                                                            message: "キャリブレーションが完了しました。",
+                                                            to_email: "af22090@shibaura-it.ac.jp"
+                                                        }).then(function(response) {
+                                                            console.log("メール送信成功:", response.status, response.text);
+                                                        }, function(error) {
+                                                            console.log("送信エラー:", error);
+                                                        });
+
                        
                             //clear the calibration & hide the last middle button
                             ClearCanvas();
@@ -105,7 +115,7 @@ function calcAccuracy() {//精度計算のための関数
 
                             
                             helloText.className = 'custom-hello';
-                            helloText.textContent = 'これから文章を読んでもらいます。\n頭を動かさず、指示をお待ちください';
+                            helloText.textContent = 'これから文章を読んでもらいます。\nおでこを装置から離さず、指示をお待ちください';
                             document.body.appendChild(helloText);
                             
                             
@@ -145,7 +155,7 @@ function calPointClick(node) {//5回クリックされたらそのポイント�
         document.getElementById('Pt5').style.removeProperty('display');
     }
 
-    if (PointCalibrate >= 2){ //17 // last point is calibrated
+    if (PointCalibrate >=2){ //17 // last point is calibrated
         // grab every element in Calibration class and hide them except the middle point.
         document.querySelectorAll('.Calibration').forEach((i) => {
             i.style.setProperty('display', 'none');
