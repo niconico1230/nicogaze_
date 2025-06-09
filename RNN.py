@@ -8,7 +8,7 @@ from D_gyou import gyou_list
 
 from D_time2 import time_list2
 from D_x2 import x_list2
-from D_y2 import y_list2
+from DATAeye2 import y_list2
 from D_gyou2 import gyou_list2
 
 # 特徴量: x, y, fixation_time（x座標, y座標, 注視時間）
