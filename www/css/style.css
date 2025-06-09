@@ -2,6 +2,23 @@ body {
     min-width:600px!important;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+#plotting_canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* z-index: 9999; 他の要素より前に表示したい場合 */
+  cursor: crosshair; /* もとのスタイル */
+}
+
 button {
     border-radius: 4px;
 }
@@ -203,7 +220,8 @@ li {
 #textContainer {
     position: absolute;
     font-size: 20pt; /* 文字サイズを設定 */
-    top: 46%;   /* 縦の中央 */
+    font-family: "MS Mincho", "serif"; /* ← 追加ここ */
+    top: 42%;   /* 縦の中央 */
     left: 50%;  /* 横の中央 */
     width: 700px;
     transform: translate(-50%, -50%); /* 要素を正確に中央に配置 */
@@ -230,3 +248,8 @@ li {
     /*max-width: 80vw; /* 画面幅の60%に制限 */
     width: auto;
   }
+
+  #start_calibration {
+  display: block;
+  margin: 0 auto;
+}
