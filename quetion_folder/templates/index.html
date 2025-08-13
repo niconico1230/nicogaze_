@@ -1,0 +1,104 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>未知語ハイライト</title>
+  <style>
+    span {
+      cursor: pointer;
+      padding: 2px;
+      font-size: 20px;
+    }
+    .center-content {
+      text-align: center;
+      margin-top: 50px;
+    }
+    .sentence {
+      font-size: 20px;
+      margin: 20px 0;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .sentence {
+      font-size: 20px;
+      margin: 20px auto;
+      padding: 10px 20px;
+      border: 2px solid #333;
+      display: inline-block;
+      border-radius: 5px; /* 任意：角を少し丸く */
+    }
+  </style>
+</head>
+<body>
+  <div class="center-content">
+    <h2>未知語アンケート</h2>
+    <p>先ほど読んだ文章について未知語（意味を知らない単語）をお答えください。</p>
+    <p>単語をクリックするとその単語の背景に色が付きます。すべての未知語に色を付けた状態で提出をしてください。</p>
+
+    <!-- JavaScriptから埋め込む部分 -->
+    <div id="text-container" class="sentence"></div>
+
+    <br>
+    <button onclick="submit()">提出</button>
+  </div>
+  
+  <script>
+    const text = "私は昨日、図書館で本を読みました。"; // 表示する文章
+    
+    const wordPositions = JSON.parse('{{ tokenized_words | tojson | safe }}');// Pythonから渡される単語情報
+
+    const container = document.getElementById("text-container");
+    
+    let unknownWords = [];
+
+    // 文字ごとに分割して表示
+    text.split('').forEach((char, index) => {
+      const span = document.createElement('span');
+      span.textContent = char;
+      span.dataset.index = index;
+      span.onclick = handleClick;
+      container.appendChild(span);
+    });
+
+    function handleClick(event) {
+      const clickedIndex = parseInt(event.target.dataset.index);
+      const matched = wordPositions.find(w => clickedIndex >= w.start && clickedIndex < w.end);
+      if (!matched) return;
+
+      const isAlready = unknownWords.some(w => w.start === matched.start && w.end === matched.end);
+      if (isAlready) {
+        unknownWords = unknownWords.filter(w => w.start !== matched.start || w.end !== matched.end);
+      } else {
+        unknownWords.push(matched);
+      }
+      updateHighlight();
+    }
+
+    function updateHighlight() {
+      document.querySelectorAll('#text-container span').forEach(span => {
+        const idx = parseInt(span.dataset.index);
+        const isSelected = unknownWords.some(w => idx >= w.start && idx < w.end);
+        span.style.backgroundColor = isSelected ? 'yellow' : '';
+      });
+    }
+
+    function submit() {
+      fetch("/submit", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ unknown_words: unknownWords })
+      }).then(res => {
+        if (res.ok) {
+          alert("提出されました");
+        } else {
+          alert("エラーが発生しました");
+        }
+      });
+    }
+  </script>
+</body>
+</html>
