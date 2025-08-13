@@ -7,7 +7,7 @@ from D_gyou2 import gyou_list2
 #eye_tracking_data = np.array([10, 12, 14, 18, 20, 30, 32, 35, 40])
 
 # 仮の文字位置（y座標）
-text_positions = np.array([170.0, 210.0, 250.0, 290.0, 330.0, 370.0, 410.0, 450.0, 490.0, 530.0])
+text_positions = np.array([165.0, 205.0, 245.0, 285.0, 325.0, 365.0, 405.0, 445.0, 485.0, 525.0])
 
 # DTW による距離計算とマッチング
 path = dtw.warping_path(np.array(gyou_list2) , text_positions)

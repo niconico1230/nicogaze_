@@ -17,7 +17,7 @@ with open("shortword.json", "r", encoding="utf-8") as f:
 
 # frequencyが10以上30以下のアイテムを抽出
 low_frequency_words = {
-    key: value for key, value in data.items() if 1 <= value["frequency"] <=20
+    key: value for key, value in data.items() if  101<= value["frequency"] <=120
 }
 
 
@@ -26,7 +26,7 @@ low_frequency_words = {
 low_freq_items = list(low_frequency_words.items())
 
 # 1%だけランダム抽出（100個に1個）
-sample_size = max(1, len(low_freq_items) //1000)  # 少なくとも1個は取る
+sample_size = max(1, len(low_freq_items) //100)  # 少なくとも1個は取る
 sampled_items = random.sample(low_freq_items, sample_size)
 
 # 結果を表示

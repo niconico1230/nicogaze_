@@ -1,9 +1,12 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from eyedata import x_list,time_list
+from eyedata import x_list
+from timedata import time_list
 from DATAmojiy import moji_list,char_list
 import matplotlib.font_manager as fm
+
+THRESHOLD = 13.5  # px以内のみ有効
 
 # 日本語フォントを指定（例：Windows）
 plt.rcParams['font.family'] = 'MS Gothic'  # Windows標準
@@ -22,8 +25,8 @@ char_df = pd.DataFrame({
 })
 
 # 範囲と滞在時間の初期化
-char_df["x_start"] = char_df["x_center"] - 50
-char_df["x_end"] = char_df["x_center"] + 50
+#char_df["x_start"] = char_df["x_center"] - 50
+#char_df["x_end"] = char_df["x_center"] + 50
 char_df["duration_ms"] = 0
 
 print(f"✅ char_df 読み込み完了: {len(char_df)}文字")
@@ -33,7 +36,7 @@ print(f"✅ char_df 読み込み完了: {len(char_df)}文字")
 for i in range(len(gaze_df) - 1):
     t1, x1 = gaze_df.iloc[i]["timestamp"], gaze_df.iloc[i]["gaze_x"]
     t2 = gaze_df.iloc[i + 1]["timestamp"]
-    duration = abs(t2 - t1)
+    duration = t2 - t1
     matched = False
 
     min_dist = float("inf")
@@ -45,9 +48,8 @@ for i in range(len(gaze_df) - 1):
             min_dist = dist
             target_idx = idx
 
-    if target_idx is not None:
+    if target_idx is not None and min_dist <= THRESHOLD:
         char_df.at[target_idx, "duration_ms"] += duration
-        #print(f"... → 文字 {char_df.at[target_idx, 'char']} (範囲 {row['x_start']:.1f}〜{row['x_end']:.1f}) にHIT")
 
 # ---------- 4. ヒートマップ表示 ----------
 print("\n📊 各文字ごとの滞在時間（ms）:")
