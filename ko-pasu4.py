@@ -14,7 +14,7 @@ with open("shortword.json", "r", encoding="utf-8") as f:
     #if i >= 20:
         #break
 
-
+"""
 # frequencyが10以上30以下のアイテムを抽出
 low_frequency_words = {
     key: value for key, value in data.items() if  101<= value["frequency"] <=120
@@ -35,3 +35,23 @@ for key, value in sampled_items:
     #print(f"{value["word"]}")
 
 
+"""
+
+# 結果を格納するリスト
+results = []
+
+# frequency = 1 ～ 100 の範囲で処理
+for freq in range(501, 601):
+    # そのfrequencyに対応する単語を集める
+    words_at_freq = [
+        (key, value) for key, value in data.items() if value["frequency"] == freq
+    ]
+    
+    if words_at_freq:  # 候補がある場合
+        # ランダムに1つ選ぶ
+        key, value = random.choice(words_at_freq)
+        results.append((value["word"], value["word2"], value["frequency"], value["pos_category"]))
+
+# 結果を表示
+for word, word2, freq, pos in results:
+    print(word, word2, freq, pos)
