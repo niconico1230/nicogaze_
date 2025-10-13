@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from fugashi import Tagger
+import unidic_lite
+from pathlib import Path
 
 app = Flask(__name__)
 
@@ -8,7 +10,8 @@ TEXT = "私は昨日、図書館で本を読みました。"
 
 # 形態素解析して、単語ごとの開始・終了位置を取得
 def tokenize_with_index(text):
-    tagger = Tagger()
+    dic_path = Path(unidic_lite.DICDIR)  # pathlib で安全にパスを扱う
+    tagger = Tagger(f'-d "{dic_path}"')  # ダブルクオートでパス全体を囲む
     tokens = []
     pos = 0
     for word in tagger(text):
