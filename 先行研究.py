@@ -94,6 +94,7 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
         # 修正後の視線データ
         y_coords = np.array([text_positions[p[1]] for p in path])
     #===dtw===#
+     
 
 
     #===1行ごとの視線数を数える。　４個以下の時もある====#
@@ -127,6 +128,8 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
 
 
 
+
+
     #===文字を１行ごとに分ける、リストを作る===#
         ynum=0#行番号　配列番号
         sumy=0#１行に何文字あるか
@@ -148,6 +151,7 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
             new_list2 = x_moji[startpoji : finishpoji]#finishpojiの１つ前まで動作する
             x_moji_second.append(new_list2) #[[あいうえ],[おかきく]...] ok
     #===文字を１行ごとに分ける===#
+
 
 
 
@@ -194,6 +198,8 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
     #===射影変換====#
 
 
+
+
     #######ヒートマップ作成開始#################
        
         # 空の2次元配列を準備 集計用
@@ -211,6 +217,10 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
 
                 # そのリストを2次元配列に追加 [[0, 1, 0], [0, 2, 0], [1, 1, 0]]ok
                 array_2d.append(row)
+
+
+
+
 
 
         #⑵
@@ -251,7 +261,8 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
             
             # この一時的なリストを2次元配列に追加　 [[2, 1,33.4], [3, 2,54.3], [4, 3.43.3]] ok
             coords_2d.append(temp_list)
-        
+        bring_array.append(0)
+
         
         
 
@@ -275,6 +286,8 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
                             item1[2] +=item2[2]#滞在時間を追加
                             break #for item1のループを抜ける。for yからまた始める
                         #array_2dは[[1, 1, 33.5], [1, 12, 120.2], [1, 3, 0]]のようになる maybeok
+
+            
         
 
         #(3.5)
@@ -336,20 +349,6 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
                         num2[3]+=num1[2]#文字の横に滞在時間を追加 #[[1,1,'あ',56.3],[1,2,'あ',21.4]...] ok
                 #massが広がり、複数の文字が同じ四角に存在する可能性が増えるため、forを回し続ける
 
-            if(mass==1):
-                            # 保存先のファイル名
-                file_name = 'output先行研究.csv'
-                # CSVファイルに書き込み
-                # 'w' モード（書き込み）でファイルを開き、newline='' を指定します。
-                # newline='' は、CSVファイル書き込み時に余分な空行が入るのを防ぐためのおまじないです。
-                with open(file_name, 'w', newline='', encoding='utf-8') as csvfile:
-                    # csv.writer オブジェクトを作成
-                    writer = csv.writer(csvfile)
-
-                    # writerow() で1d行ずつ書き込むか、writerows() で全てのデータを一度に書き込みます。
-                    writer.writerows(moji_2d)
-
-                print(f"'{file_name}' にデータを保存しました。")
           
 
 
@@ -477,7 +476,7 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
                         PREC_mat[0, j] = precision
                         RECALL_mat[0, j] = recall
 
-
+                        print("th:",th,"mass:",mass)
                         print(f"正解（1）を正解（1）と判定（TP率/Recall）      : {recall:.3f}")
                         print(f"正解（1）を不正解（0）と判定（FN率/FN/TP+FN）  : {fnr:.3f}")
                         print(f"不正解（0）を不正解（0）と判定（TN率/Specificity）: {specificity:.3f}")
@@ -485,8 +484,8 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
                         print(f"適合率（Precision）                               : {precision:.3f}")
                         print(f"F1スコア                                        : {f1:.3f}")
                         print(f"全体精度（Accuracy）                             : {accuracy:.3f}")
-
                         """
+                        
                         print("\n【正解を不正解と判定した単語（偽陰性/FN）一覧】")
                         for w in words:
                             if w["true"] == 1 and w["pred"] == 0:
@@ -499,6 +498,25 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
 
                         print("\n\n")
                         """
+
+        
+        # 必要なら最適組み合わせも出力
+        best_idx = np.unravel_index(F1_mat.argmax(), F1_mat.shape)
+        print(f"最大F1={F1_mat[best_idx]:.3f}（秒数閾値: {th_range[best_idx[1]]}")
+
+
+        df["bring2"] = (bring_array)
+        df["dist_speed"] = pd.Series(dist_speed)
+
+        df.to_csv("gaze先行研究out.csv", index=False, encoding="utf-8-sig")
+        print("mojiout.csvとして出力しました。")
+        
+
+
+
+
+
+
                     
 
                         
