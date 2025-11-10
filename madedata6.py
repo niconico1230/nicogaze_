@@ -85,6 +85,7 @@ def process_one_pair(made_file, moji_file, file_idx):
             start, end = latest_flag_interval
             if start <= now_time <= end:
                 df.at[i, 'flag'] = 1
+                continue
 
 
         # speed/left_dist条件を満たしたら、新しい区間で上書き
@@ -92,6 +93,8 @@ def process_one_pair(made_file, moji_file, file_idx):
             start = now_time
             end = now_time + FLAG_DURATION
             latest_flag_interval = (start, end)  # ← 最新の区間で上書き
+
+            df.at[i, 'flag'] = 1
         """
     ##########瞬き除去end###################################
 

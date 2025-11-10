@@ -4,7 +4,7 @@ import numpy as np
 
 # CSV読み込み
 df = pd.read_csv("made.csv")
-moji_df = pd.read_csv("moji.csv")
+moji_df = pd.read_csv("moji1.csv")
 
 # もとのmoji_dfに自動でline列を付与する
 moji_df = moji_df.sort_values(by=["y", "x"]).reset_index(drop=True)
@@ -45,11 +45,11 @@ df['x_speed'] = dx / dt
 df['flag'] = 0
 
 
-"""
+
 
 #### 瞬き除去 start##############################
 
-FLAG_DURATION = 325.3  # ms
+FLAG_DURATION = 338.33  # ms
 future_flags = []
 # 最新のフラグ区間（なければNone）
 latest_flag_interval = None
@@ -63,6 +63,7 @@ for i in range(1, len(df)):
         start, end = latest_flag_interval
         if start <= now_time <= end:
             df.at[i, 'flag'] = 1
+            continue
 
 
     # speed/left_dist条件を満たしたら、新しい区間で上書き
@@ -70,6 +71,7 @@ for i in range(1, len(df)):
         start = now_time
         end = now_time + FLAG_DURATION
         latest_flag_interval = (start, end)  # ← 最新の区間で上書き
+        df.at[i, 'flag'] = 1
 
 ##########瞬き除去end###################################
 
@@ -113,7 +115,7 @@ for idx in range(1, len(df)):
 
 
 ##########改行除去end###################################
-
+"""
 
 
 
@@ -154,8 +156,8 @@ for i, row in df.iterrows():
             prev_time = t
 
 # 出力
-for i, row in moji_df.iterrows():
-    print(f"{row['moji']}: 注視回数 {count[i]}, 合計滞留時間 {stay_time[i]:.2f} ms")
+#for i, row in moji_df.iterrows():
+    #print(f"{row['moji']}: 注視回数 {count[i]}, 合計滞留時間 {stay_time[i]:.2f} ms")
 
 ##########文字と視線のつなぎend###################################
 

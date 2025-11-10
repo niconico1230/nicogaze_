@@ -224,7 +224,7 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
 
 
         #⑵
-        FLAG_DURATION = 325.3  # ms　瞬きの継続時間
+        FLAG_DURATION = 338.33  # ms　瞬きの継続時間
         bring=0 #瞬きしているかのフラグ
         bring_array=[]
         latest_flag_interval = None # latest_flag_intervalをNoneで初期化
@@ -242,10 +242,11 @@ def extract_gaze_coordinates(file_path,file_path2,yoko,tate):
 
             # speed/left_dist条件を満たしたら、新しい区間で上書き
             if ((dist_speed[i] >= 40) or (dist_speed[i] <= -40)) and (left_dist[i] <= 7):
-                start = time[i]
-                end = time[i] + FLAG_DURATION
-                latest_flag_interval = (start, end)  # ← 最新の区間で上書き
-                bring=1 #瞬き中のフラグ
+                if latest_flag_interval is None or time[i] > latest_flag_interval[1]:
+                    start = time[i]
+                    end = time[i] + FLAG_DURATION
+                    latest_flag_interval = (start, end)  # ← 最新の区間で上書き
+                    bring=1 #瞬き中のフラグ
 
             if(bring==0):
                 dur=time[i+1]-time[i]#視線の滞在時間。次までの差を前の視線に追加

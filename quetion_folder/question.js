@@ -29,3 +29,4 @@ function updateHighlight() {
     span.style.backgroundColor = isSelected ? 'yellow' : '';
   });
 }
+

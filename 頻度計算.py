@@ -48,17 +48,24 @@ for th in thresholds:
     recall_list.append(recall)
     f1_list.append(f1)
 
+
+font_size = 20
+
 # 5. グラフ描画
-plt.figure(figsize=(8, 5))
+plt.figure(figsize=(10, 6))
 plt.plot(thresholds, precision_list, label="Precision")
 plt.plot(thresholds, recall_list, label="Recall")
 plt.plot(thresholds, f1_list, label="F1 Score")
 
-plt.xlabel("頻度閾値（以下を未知語と判定）")
-plt.ylabel("指標値")
-plt.title("頻度による未知語判定の精度・再現率・F1スコア")
+plt.xlabel("頻度閾値（以下を未知語と判定）",fontsize=font_size)
+plt.ylabel("指標値",fontsize=font_size)
+#plt.title("頻度による未知語判定の精度・再現率・F1スコア")
 plt.grid(True)
 plt.ylim(0, 1.05)
+plt.xlim(0, 300)
+# ★ 軸目盛り(数字)のフォントサイズ
+plt.xticks(fontsize=font_size)
+plt.yticks(fontsize=font_size)
 plt.legend()
 plt.show()
 

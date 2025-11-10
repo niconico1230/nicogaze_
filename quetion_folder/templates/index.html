@@ -1,104 +1,195 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>未知語ハイライト</title>
-  <style>
-    span {
-      cursor: pointer;
-      padding: 2px;
-      font-size: 20px;
-    }
-    .center-content {
-      text-align: center;
-      margin-top: 50px;
-    }
-    .sentence {
-      font-size: 20px;
-      margin: 20px 0;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .sentence {
-      font-size: 20px;
-      margin: 20px auto;
-      padding: 10px 20px;
-      border: 2px solid #333;
-      display: inline-block;
-      border-radius: 5px; /* 任意：角を少し丸く */
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>未知語ハイライト</title>
+    <style>
+        /* スタイルは変更なし */
+        span { cursor: pointer; padding: 2px; font-size: 20px; }
+        .center-content { text-align: center; margin-top: 50px; }
+        .sentence { font-size: 20px; margin: 20px 0; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        .sentence {
+            width: 70%;
+            font-size: 20px;
+            margin: 20px auto;
+            padding: 10px 20px;
+            border: 2px solid #333;
+            display: inline-block;
+            border-radius: 5px;
+        }
+        /* 【新規】初期画面の表示を制御 */
+        #survey-content { display: none; }
+        #initial-form { margin-bottom: 20px; }
+        #initial-form input { padding: 8px; font-size: 16px; width: 300px; }
+    </style>
 </head>
 <body>
-  <div class="center-content">
-    <h2>未知語アンケート</h2>
-    <p>先ほど読んだ文章について未知語（意味を知らない単語）をお答えください。</p>
-    <p>単語をクリックするとその単語の背景に色が付きます。すべての未知語に色を付けた状態で提出をしてください。</p>
+    <div class="center-content">
+        <h2>未知語アンケート</h2>
 
-    <!-- JavaScriptから埋め込む部分 -->
-    <div id="text-container" class="sentence"></div>
+        <div id="initial-form">
+            <label for="respondent-name">回答者名:</label>
+            <input type="text" id="respondent-name" placeholder="お名前を入力してください" oninput="toggleStartButton()">
+            <button id="start-button" onclick="startSurvey()">アンケート開始</button>
+        </div>
 
-    <br>
-    <button onclick="submit()">提出</button>
-  </div>
-  
-  <script>
-    const text = "私は昨日、図書館で本を読みました。"; // 表示する文章
-    
-    const wordPositions = JSON.parse('{{ tokenized_words | tojson | safe }}');// Pythonから渡される単語情報
+        <div id="survey-content"></div>
+            <p>先ほど読んだ文章について未知語（意味を知らない単語）をお答えください。</p>
+            <p>単語をクリックするとその単語の背景に色が付きます。すべての未知語に色を付けた状態で**次へ**進んでください。</p>
 
-    const container = document.getElementById("text-container");
-    
-    let unknownWords = [];
+            <div id="text-container" class="sentence"></div>
 
-    // 文字ごとに分割して表示
-    text.split('').forEach((char, index) => {
-      const span = document.createElement('span');
-      span.textContent = char;
-      span.dataset.index = index;
-      span.onclick = handleClick;
-      container.appendChild(span);
-    });
+            <br>
+            <button id="next-button" onclick="nextSentence()">次へ</button>
+        </div>   
+        
+        <div id="download-area" style="margin-top: 30px; display: none;">
+            <button onclick="downloadCSV()">結果をCSVで保存</button>
+        </div>
 
-    function handleClick(event) {
-      const clickedIndex = parseInt(event.target.dataset.index);
-      const matched = wordPositions.find(w => clickedIndex >= w.start && clickedIndex < w.end);
-      if (!matched) return;
+    </div>
 
-      const isAlready = unknownWords.some(w => w.start === matched.start && w.end === matched.end);
-      if (isAlready) {
-        unknownWords = unknownWords.filter(w => w.start !== matched.start || w.end !== matched.end);
-      } else {
-        unknownWords.push(matched);
-      }
-      updateHighlight();
-    }
+    <script>
+        // Pythonから渡される初期値
+        let text = "{{ text | safe }}"; // 最初の文章
+        let wordPositions = JSON.parse('{{ tokenized_words | tojson | safe }}');
+        let unknownWords = []; // 選択中の未知語リスト
+        let isLastSentence = false; // 最後の文章かどうか
+        // 【新規】回答者名を保持する変数
+        let respondentName = "";
 
-    function updateHighlight() {
-      document.querySelectorAll('#text-container span').forEach(span => {
-        const idx = parseInt(span.dataset.index);
-        const isSelected = unknownWords.some(w => idx >= w.start && idx < w.end);
-        span.style.backgroundColor = isSelected ? 'yellow' : '';
-      });
-    }
+        const container = document.getElementById("text-container");
+        const nextButton = document.getElementById("next-button");
+        const surveyContent = document.getElementById("survey-content");
+        const initialForm = document.getElementById("initial-form");
 
-    function submit() {
-      fetch("/submit", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ unknown_words: unknownWords })
-      }).then(res => {
-        if (res.ok) {
-          alert("提出されました");
-        } else {
-          alert("エラーが発生しました");
+
+
+        // 【新規】ボタン要素を取得
+        const startButton = document.getElementById("start-button");
+        const nameInput = document.getElementById("respondent-name");
+
+        // 【新規関数】入力内容に応じてボタンの有効/無効を切り替える
+        function toggleStartButton() {
+            const nameLength = nameInput.value.trim().length;
+            // 名前が1文字以上あればボタンを有効化、そうでなければ無効化
+            startButton.disabled = nameLength === 0;
         }
-      });
-    }
-  </script>
+
+
+        // --- 初期画面と開始処理 (新規) ---
+        function startSurvey() {
+            respondentName = nameInput.value.trim();
+            if (respondentName.length === 0) {
+                alert("⚠️ アンケートを開始するには、回答者名を入力してください。");
+                return; // 処理を中断
+            }
+
+            // 1. サーバーに名前を送信・保存
+            fetch("/set_name", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: respondentName })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    // 2. 画面をアンケートモードに切り替える
+                    initialForm.style.display = 'none';
+                    surveyContent.style.display = 'block';
+                    updateSentence(text); // 最初の文章を表示
+                } else {
+                    alert("名前の保存に失敗しました。");
+                }
+            })
+            .catch(error => {
+                console.error('Error starting survey:', error);
+                alert("エラーが発生しました: アンケート開始に失敗しました。");
+            });
+        }
+
+
+
+        // --- 核心機能: 文章のDOMを生成・更新する関数 ---
+        function updateSentence(newText) {
+            container.innerHTML = ''; // コンテンツをクリア
+            unknownWords = []; // 選択リストもリセット
+            
+            // 終了メッセージの場合はボーダーを非表示にする
+            container.style.border = (wordPositions.length > 0) ? '2px solid #333' : 'none';
+
+            if (wordPositions.length === 0) {
+                // 終了メッセージの場合はクリック不可の通常テキストとして表示
+                container.textContent = newText;
+            } else {
+                // 文字ごとに分割して表示
+                newText.split('').forEach((char, index) => {
+                    const span = document.createElement('span');
+                    span.textContent = char;
+                    span.dataset.index = index;
+                    span.onclick = handleClick;
+                    container.appendChild(span);
+                });
+            }
+            updateHighlight(); // 初期ハイライト（今回は空なのでクリアされる）
+        }
+        
+        // --- クリック処理（変更なし） ---
+        function handleClick(event) {
+            const clickedIndex = parseInt(event.target.dataset.index);
+            const matched = wordPositions.find(w => clickedIndex >= w.start && clickedIndex < w.end);
+            if (!matched) return;
+
+            const isAlready = unknownWords.some(w => w.start === matched.start && w.end === matched.end);
+            if (isAlready) {
+                unknownWords = unknownWords.filter(w => w.start !== matched.start || w.end !== matched.end);
+            } else {
+                unknownWords.push(matched);
+            }
+            updateHighlight();
+        }
+
+        // --- ハイライト更新（変更なし） ---
+        function updateHighlight() {
+            document.querySelectorAll('#text-container span').forEach(span => {
+                const idx = parseInt(span.dataset.index);
+                const isSelected = unknownWords.some(w => idx >= w.start && idx < w.end);
+                span.style.backgroundColor = isSelected ? 'yellow' : '';
+            });
+        }
+        
+        // --- 次へボタンの処理（修正・拡張） ---
+        function nextSentence() {
+            if (isLastSentence) return; // 既に終了メッセージなら何もしない
+
+            // 現在の未知語リストをサーバーに送信し、次の文章を取得
+            fetch("/submit_and_next", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                // 送信するデータはunknown_wordsのみ。回答者名はサーバー側で保持している
+                body: JSON.stringify({ unknown_words: unknownWords }) 
+            })
+            .then(res => res.json())
+            .then(data => {
+                text = data.text; 
+                wordPositions = data.tokenized_words; 
+                isLastSentence = data.is_last;
+
+                updateSentence(text); 
+
+                if (isLastSentence) {
+                    // 最後の文章（終了メッセージ）の場合
+                    nextButton.style.display = 'none'; // 次へボタンを非表示
+                    alert(`${respondentName}番さん、アンケートが終了しました。`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("エラーが発生しました: 次の文章の取得に失敗しました。");
+            });
+        }
+
+    </script>
 </body>
 </html>

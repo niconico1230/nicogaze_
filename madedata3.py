@@ -10,8 +10,8 @@ tagger = Tagger()
 plt.rcParams['font.family'] = 'MS Gothic'   # または 'Meiryo', 'Yu Gothic'
 
 # 1. ファイル読み込み
-df = pd.read_csv("made5.csv")
-moji_df = pd.read_csv("moji5.csv")
+df = pd.read_csv("made.csv")
+moji_df = pd.read_csv("moji.csv")
 
 # 2. 文字ごとに「line」列を自動で付与（行ごとの位置調整、ここは元コードそのまま）
 moji_df = moji_df.sort_values(by=["y", "x"]).reset_index(drop=True)
@@ -41,7 +41,7 @@ df['flag'] = 0
 #### 瞬き除去 start##############################
 
 
-FLAG_DURATION = 325.3  # ms
+FLAG_DURATION = 338.33  # ms
 future_flags = []
 # 最新のフラグ区間（なければNone）
 latest_flag_interval = None
@@ -55,6 +55,7 @@ for i in range(1, len(df)):
         start, end = latest_flag_interval
         if start <= now_time <= end:
             df.at[i, 'flag'] = 1
+            continue
 
 
     # speed/left_dist条件を満たしたら、新しい区間で上書き
@@ -62,6 +63,7 @@ for i in range(1, len(df)):
         start = now_time
         end = now_time + FLAG_DURATION
         latest_flag_interval = (start, end)  # ← 最新の区間で上書き
+        df.at[i, 'flag'] = 1
 
 ##########瞬き除去end###################################
 
