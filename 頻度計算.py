@@ -66,7 +66,7 @@ plt.xlim(0, 300)
 # ★ 軸目盛り(数字)のフォントサイズ
 plt.xticks(fontsize=font_size)
 plt.yticks(fontsize=font_size)
-plt.legend()
+plt.legend(fontsize=font_size)
 plt.show()
 
 

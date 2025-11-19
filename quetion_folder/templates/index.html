@@ -29,7 +29,7 @@
         <h2>未知語アンケート</h2>
 
         <div id="initial-form">
-            <label for="respondent-name">回答者名:</label>
+            <label for="respondent-name">回答者番号:</label>
             <input type="text" id="respondent-name" placeholder="お名前を入力してください" oninput="toggleStartButton()">
             <button id="start-button" onclick="startSurvey()">アンケート開始</button>
         </div>
@@ -82,7 +82,7 @@
         function startSurvey() {
             respondentName = nameInput.value.trim();
             if (respondentName.length === 0) {
-                alert("⚠️ アンケートを開始するには、回答者名を入力してください。");
+                alert("⚠️ アンケートを開始するには、回答者番号を入力してください。");
                 return; // 処理を中断
             }
 

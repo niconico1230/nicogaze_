@@ -1,7 +1,7 @@
 from fugashi import Tagger
 
 tagger = Tagger()
-text = "これ"
+text = "秘め事がある"
 
 for token in tagger(text):
     print(f"単語: {token.surface}")

@@ -21,7 +21,6 @@ low_frequency_words = {
 }
 
 
-
 # アイテムをリストに変換
 low_freq_items = list(low_frequency_words.items())
 
@@ -40,8 +39,8 @@ for key, value in sampled_items:
 # 結果を格納するリスト
 results = []
 
-# frequency = 1 ～ 100 の範囲で処理
-for freq in range(501, 601):
+# frequency = 1 ～ 100の範囲で処理
+for freq in range(206,208):
     # そのfrequencyに対応する単語を集める
     words_at_freq = [
         (key, value) for key, value in data.items() if value["frequency"] == freq
